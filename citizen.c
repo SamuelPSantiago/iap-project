@@ -188,19 +188,31 @@ void deleteCitizen()
     printf("\nDigite o CPF da pessoa que deseja deletar: ");
     scanf("%12s", cpf);
     cleanerKeyboard();
-    printf("\n");
 
     for (int i = 0; i < citizensCount; i++)
     {
         if (strcmp(citizens[i].cpf, cpf) == 0 && !citizens[i].deleted)
         {
-            citizens[i].deleted = 1;
-            citizensModified = 1;
-
-            printShowCitizenHeader("Pessoa deletada com sucesso!");
+            printShowCitizenHeader("Pessoa encontrada:");
             printShowCitizenUI(&citizens[i]);
             printShowCitizenBorder();
 
+            printf("Tem certeza que deseja excluir? (s/N): ");
+            int ch = getchar();
+            cleanerKeyboard();
+            if (ch != 's' && ch != 'S')
+            {
+                printf("\nExclusao cancelada.\n");
+
+                printf("Pressione Enter para continuar...\n");
+                cleanerKeyboard();
+                return;
+            }
+
+            citizens[i].deleted = 1;
+            citizensModified = 1;
+
+            printf("\nPessoa deletada com sucesso.\n");
             printf("Pressione Enter para continuar...\n");
             cleanerKeyboard();
             return;
@@ -424,22 +436,17 @@ void printShowCitizenBorder()
 }
 void printShowCitizenUI(const citizen *p)
 {
-    char bufName[31];
-    char bufAddress[31];
+    char name[31];
+    formatBigString(p->name, 30, name, sizeof(name));
 
-    size_t lenName = strlen(p->name);
-    if (lenName > 30) snprintf(bufName, sizeof bufName, "%.*s...", 27, p->name);
-    else snprintf(bufName, sizeof bufName, "%.30s", p->name);
-
-    size_t lenAddress = strlen(p->address);
-    if (lenAddress > 30) snprintf(bufAddress, sizeof bufAddress, "%.*s...", 27, p->address);
-    else snprintf(bufAddress, sizeof bufAddress, "%.30s", p->address);
+    char address[31];
+    formatBigString(p->address, 30, address, sizeof(address));
 
     printf("| %-11s | %-13s | %-30s | %-11s | %-30s | %-11s |\n", 
            p->cpf,
            p->voterNumber,
-           bufName,
+           name,
            p->phone,
-           bufAddress,
+           address,
            p->birthdate);
 }

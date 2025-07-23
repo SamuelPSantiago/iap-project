@@ -68,3 +68,13 @@ void cleanerKeyboard()
     while (getchar() != '\n')
         ;
 }
+void formatBigString(const char *str, size_t width, char *outBuf, size_t outBufSize) {
+    size_t len = strlen(str);
+    if (len > width && width > 3)
+        snprintf(outBuf, outBufSize, "%.*s...", (int)(width - 3), str);
+    else if (len > width) {
+        size_t dots = width < outBufSize - 1 ? width : outBufSize - 1;
+        memset(outBuf, '.', dots);
+        outBuf[dots] = '\0';
+    } else snprintf(outBuf, outBufSize, "%s", str);
+}

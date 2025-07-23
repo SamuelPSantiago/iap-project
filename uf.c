@@ -10,6 +10,7 @@ static uf *ufs = NULL;
 static int ufsCount = 0;
 static int ufsCapacity = 0;
 static int ufsModified = 0;
+static int nextCodeUF = 1;
 
 // Menu controllers
 void menuUF()
@@ -81,11 +82,15 @@ void loadUFs()
     ufsCount = ufsCapacity = 0;
 
     uf tmp;
-    while (fread(&tmp, sizeof(uf), 1, f) == 1) 
+    int maxCode = 0;
+    while (fread(&tmp, sizeof(uf), 1, f) == 1) {
+        if (tmp.code > maxCode) maxCode = tmp.code;
         if (!tmp.deleted) pushUF(&tmp);
+    }
 
     fclose(f);
     ufsModified = 0;
+    nextCodeUF = maxCode + 1;
 }
 void saveUFs()
 {
@@ -165,19 +170,31 @@ void deleteUF()
     printf("\nDigite o codigo da UF que deseja excluir: ");
     scanf("%d", &dCode);
     cleanerKeyboard();
-    printf("\n");
 
     for (int i = 0; i < ufsCount; i++)
     {
         if (ufs[i].code == dCode && !ufs[i].deleted)
         {
-            ufs[i].deleted = 1;
-            ufsModified = 1;
-
-            printShowUFHeader("UF deletada com sucesso!");
+            printShowUFHeader("UF encontrada:");
             printShowUFUI(&ufs[i]);
             printShowUFBorder();
 
+            printf("Tem certeza que deseja excluir? (s/N): ");
+            int ch = getchar();
+            cleanerKeyboard();
+            if (ch != 's' && ch != 'S')
+            {
+                printf("\nExclusao cancelada.\n");
+
+                printf("Pressione Enter para continuar...\n");
+                cleanerKeyboard();
+                return;
+            }
+
+            ufs[i].deleted = 1;
+            ufsModified = 1;
+
+            printf("\nUF deletada com sucesso.\n");
             printf("Pressione Enter para continuar...\n");
             cleanerKeyboard();
             return;
@@ -336,9 +353,7 @@ int searchAcronym(const char *sAcronym)
 
 int getNextCode()
 {
-    if (!ufsCount)
-        return 1;
-    return (ufs[ufsCount - 1].code + 1);
+    return nextCodeUF++;
 }
 
 void printShowUFHeader(const char *header)
@@ -357,14 +372,11 @@ void printShowUFBorder()
 }
 void printShowUFUI(const uf *p)
 {
-    char buf[31];
-
-    size_t len = strlen(p->description);
-    if (len > 30) snprintf(buf, sizeof buf, "%.*s...", 27, p->description);
-    else snprintf(buf, sizeof buf, "%.30s", p->description);
+    char description[31];
+    formatBigString(p->description, 30, description, sizeof(description));
 
     printf("| %6d | %-6s | %-30s |\n",
            p->code,
            p->acronym,
-           buf);
+           description);
 }
