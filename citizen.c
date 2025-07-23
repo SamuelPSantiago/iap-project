@@ -82,10 +82,7 @@ void loadCitizens()
     
     citizen tmp;
     while (fread(&tmp, sizeof(citizen), 1, f) == 1)
-    {
-        if (tmp.deleted) continue;
-        pushCitizen(&tmp);
-    }
+        if (!tmp.deleted) pushCitizen(&tmp);
 
     fclose(f);
     citizensModified = 0;
@@ -136,10 +133,7 @@ void createCitizen()
     pushCitizen(&tmp);
     citizensModified = 1;
 
-    printf("\n");
-    printDefaultCitizenBorder();
-    printf("| Citizen created successfully!                                                                                              |\n");
-    printShowCitizenHeader();
+    printShowCitizenHeader("Pessoa criada com sucesso!");
     printShowCitizenUI(&tmp);
     printShowCitizenBorder();
 
@@ -148,31 +142,40 @@ void createCitizen()
 }
 void updateCitizen()
 {
-    char cpf[12];
+    citizen tmp;
+
     printf("\nDigite o CPF do citizen que deseja alterar: ");
-    scanf("%11s", cpf);
+    scanf("%12s", tmp.cpf);
     cleanerKeyboard();
 
-    int index = searchCitizenByCPF(cpf);
-    if (index < 0)
+    if (strlen(tmp.cpf) != 11 || !isdigit(tmp.cpf[0]) || !isdigit(tmp.cpf[1]) ||
+        !isdigit(tmp.cpf[2]) || !isdigit(tmp.cpf[3]) || !isdigit(tmp.cpf[4]) ||
+        !isdigit(tmp.cpf[5]) || !isdigit(tmp.cpf[6]) || !isdigit(tmp.cpf[7]) ||
+        !isdigit(tmp.cpf[8]) || !isdigit(tmp.cpf[9]) || !isdigit(tmp.cpf[10]))
     {
-        printf("Citizen com CPF %s nao encontrado.\n", cpf);
+        printf("CPF invalido. Tente novamente.\n");
         return;
     }
 
-    citizen *tmp = &citizens[index];
+    printf("\n");
 
-    readPhone(tmp, "Digite o novo telefone: ");
-    readAddress(tmp, "Digite o novo endereco: ");
-    readBirthdate(tmp, "Digite a nova data de nascimento (YYYY-MM-DD): ");
+    int index = searchCitizenByCPF(tmp.cpf);
+    if (index < 0)
+    {
+        printf("Citizen com CPF %s nao encontrado.\n\n", tmp.cpf);
+        return;
+    }
+
+    tmp = citizens[index];
+
+    readPhone(&tmp, "Digite o novo telefone: ");
+    readAddress(&tmp, "Digite o novo endereco: ");
+    readBirthdate(&tmp, "Digite a nova data de nascimento (YYYY-MM-DD): ");
 
     citizensModified = 1;
 
-    printf("\n");
-    printDefaultCitizenBorder();
-    printf("| Citizen updated successfully!                                                                                              |\n");
-    printShowCitizenHeader();
-    printShowCitizenUI(tmp);
+    printShowCitizenHeader("Pessoa atualizada com sucesso!");
+    printShowCitizenUI(&tmp);
     printShowCitizenBorder();
 
     printf("Pressione Enter para continuar...\n");
@@ -181,21 +184,33 @@ void updateCitizen()
 void deleteCitizen()
 {
     char cpf[12];
-    printf("\nDigite o CPF do citizen que deseja deletar: ");
-    scanf("%11s", cpf);
-    cleanerKeyboard();
 
-    int index = searchCitizenByCPF(cpf);
-    if (index < 0)
+    printf("\nDigite o CPF da pessoa que deseja deletar: ");
+    scanf("%12s", cpf);
+    cleanerKeyboard();
+    printf("\n");
+
+    for (int i = 0; i < citizensCount; i++)
     {
-        printf("Citizen com CPF %s nao encontrado.\n", cpf);
-        return;
+        if (strcmp(citizens[i].cpf, cpf) == 0 && !citizens[i].deleted)
+        {
+            citizens[i].deleted = 1;
+            citizensModified = 1;
+
+            printShowCitizenHeader("Pessoa deletada com sucesso!");
+            printShowCitizenUI(&citizens[i]);
+            printShowCitizenBorder();
+
+            printf("Pressione Enter para continuar...\n");
+            cleanerKeyboard();
+            return;
+        }
     }
 
-    citizens[index].deleted = 1;
-    citizensModified = 1;
-
-    printf("Citizen com CPF %s marcado como deletado.\n", cpf);
+    printf("Pessoa com CPF %s nao encontrado ou ja deletado.\n", cpf);
+    
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
 }
 void showCitizen()
 {
@@ -205,44 +220,54 @@ void showCitizen()
         return;
     }
 
-    printf("\n");
-    printDefaultCitizenBorder();
-    printf("| Citizens list:                                                                                                             |\n");
-    printShowCitizenHeader();
+    printShowCitizenHeader("Lista de pessoas:");
 
     for (int i = 0; i < citizensCount; i++)
         if (!citizens[i].deleted)
             printShowCitizenUI(&citizens[i]);
 
     printShowCitizenBorder();
+
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
 void showSpecificCitizen()
 {
-    char cpf[12];
-    printf("\nDigite o CPF do citizen que deseja mostrar: ");
-    scanf("%11s", cpf);
-    cleanerKeyboard();
-
-    int index = searchCitizenByCPF(cpf);
-    if (index < 0)
+    if (citizensCount == 0)
     {
-        printf("Citizen com CPF %s nao encontrado.\n", cpf);
+        printf("Nenhuma pessoa cadastrada.\n");
         return;
     }
 
-    citizen *tmp = &citizens[index];
-
-    printf("\n");
-    printDefaultCitizenBorder();
-    printf("| Citizen found!                                                                                                             |\n");
-    printShowCitizenHeader();
-    printShowCitizenUI(tmp);
-    printShowCitizenBorder();
-
-    printf("Pressione Enter para continuar...\n");
+    char cpf[12];
+    printf("\nDigite o CPF da pessoa que deseja ver: ");
+    scanf("%11s", cpf);
     cleanerKeyboard();
+    printf("\n");
+
+    int found = 0;
+    for (int i = 0; i < citizensCount; i++)
+    {
+        if (!strcmp(citizens[i].cpf, cpf) == 0)
+            continue;
+        
+        if(!citizens[i].deleted)
+        {
+            printShowCitizenHeader("UF encontrada!");
+            printShowCitizenUI(&citizens[i]);
+            printShowCitizenBorder();
+
+            printf("Pressione Enter para continuar...\n");
+            cleanerKeyboard();
+        }
+        else printf("Pessoa com CPF %s nao encontrada.\n", cpf);
+
+        found = 1;
+        break;
+    }
+
+    if (!found)
+        printf("Pessoa com CPF %s nao encontrada\n", cpf);
 }
 
 // Utils
@@ -383,12 +408,11 @@ int searchCitizenByVoterNumber(const char *voterNumber)
     return -1;
 }
 
-void printDefaultCitizenBorder()
+void printShowCitizenHeader(const char *header)
 {
+    printf("\n");
     printf("+----------------------------------------------------------------------------------------------------------------------------+\n");
-}
-void printShowCitizenHeader()
-{
+    printf("| %-122s |\n", header);
     printShowCitizenBorder();
     printf("| %-11s | %-13s | %-30s | %-12s | %-30s | %-11s |\n",
            "CPF", "Title", "Name", "Phone", "Address", "Birthdate");

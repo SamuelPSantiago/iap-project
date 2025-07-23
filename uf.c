@@ -82,10 +82,7 @@ void loadUFs()
 
     uf tmp;
     while (fread(&tmp, sizeof(uf), 1, f) == 1) 
-    {
-        if (tmp.deleted)
-        pushUF(&tmp);
-    }
+        if (!tmp.deleted) pushUF(&tmp);
 
     fclose(f);
     ufsModified = 0;
@@ -119,92 +116,16 @@ void createUF()
     readAcronym(&tmp, -1, "Digite a sigla da UF (2 letras): ");
     readDescription(&tmp, "Digite a descricao da UF: ");
 
+    tmp.deleted = 0;
     pushUF(&tmp);
     ufsModified = 1;
 
-    printf("\n");
-    printDefaultUFBorder();
-    printf("| UF criada com sucesso!                           |\n");
-    printShowUFBorder();
-    printf("| %-6s | %-6s | %-30s |\n",
-           "Codigo", "Sigla", "Descricao");
-    printShowUFBorder();
+    printShowUFHeader("UF criada com sucesso!");
     printShowUFUI(&tmp);
     printShowUFBorder();
 
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
-}
-void showUF()
-{
-    if (ufsCount == 0)
-    {
-        printf("Nenhuma UF cadastrada.\n");
-        return;
-    }
-
-    printf("\n");
-    printShowUFBorder();
-    printf("| %-6s | %-6s | %-30s |\n",
-           "Codigo", "Sigla", "Descricao");
-    printShowUFBorder();
-
-    for (int i = 0; i < ufsCount; i++)
-    {
-        if (ufs[i].deleted)
-            continue;
-
-        printShowUFUI(&ufs[i]);
-    }
-
-    printShowUFBorder();
-
-    printf("Pressione Enter para continuar...\n");
-    cleanerKeyboard();
-}
-void showSpecificUF()
-{
-    if (ufsCount == 0)
-    {
-        printf("Nenhuma UF cadastrada.\n");
-        return;
-    }
-
-    int sCode;
-    printf("\nDigite o codigo da UF que deseja ver: ");
-    scanf("%d", &sCode);
-    cleanerKeyboard();
-    printf("\n");
-
-    printShowUFBorder();
-    printf("| %-6s | %-6s | %-30s |\n",
-           "Codigo", "Sigla", "Descricao");
-    printShowUFBorder();
-
-    int found = 0;
-    for (int i = 0; i < ufsCount; i++)
-    {
-        if (!(ufs[i].code == sCode))
-            continue;
-
-        if (!ufs[i].deleted)
-        {
-            printShowUFUI(&ufs[i]);
-
-            printShowUFBorder();
-
-            printf("Pressione Enter para continuar...\n");
-            cleanerKeyboard();
-        }
-        else
-            printf("UF com codigo %d nao existe ou foi deletada.\n", sCode);
-
-        found = 1;
-        break;
-    }
-
-    if (!found)
-        printf("UF com codigo %d nao encontrada.\n", sCode);
 }
 void updateUF()
 {
@@ -230,13 +151,7 @@ void updateUF()
     ufs[ufIndex] = tmp;
     ufsModified = 1;
 
-    printf("\n");
-    printDefaultUFBorder();
-    printf("| UF alterada com sucesso!                          |\n");
-    printShowUFBorder();
-    printf("| %-6s | %-6s | %-30s |\n",
-           "Codigo", "Sigla", "Descricao");
-    printShowUFBorder();
+    printShowUFHeader("UF atualizada com sucesso!");
     printShowUFUI(&tmp);
     printShowUFBorder();
 
@@ -259,12 +174,7 @@ void deleteUF()
             ufs[i].deleted = 1;
             ufsModified = 1;
 
-            printDefaultUFBorder();
-            printf("| UF deletada com sucesso!                          |\n");
-            printShowUFBorder();
-            printf("| %-6s | %-6s | %-30s |\n",
-                   "Codigo", "Sigla", "Descricao");
-            printShowUFBorder();
+            printShowUFHeader("UF deletada com sucesso!");
             printShowUFUI(&ufs[i]);
             printShowUFBorder();
 
@@ -278,6 +188,63 @@ void deleteUF()
 
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
+}
+void showUF()
+{
+    if (ufsCount == 0)
+    {
+        printf("Nenhuma UF cadastrada.\n");
+        return;
+    }
+
+    printShowUFHeader("Lista de UFs:");
+
+    for (int i = 0; i < ufsCount; i++)
+        if (!ufs[i].deleted)
+            printShowUFUI(&ufs[i]);
+
+    printShowUFBorder();
+    
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
+}
+void showSpecificUF()
+{
+    if (ufsCount == 0)
+    {
+        printf("Nenhuma UF cadastrada.\n");
+        return;
+    }
+
+    int sCode;
+    printf("\nDigite o codigo da UF que deseja ver: ");
+    scanf("%d", &sCode);
+    cleanerKeyboard();
+    printf("\n");
+
+    int found = 0;
+    for (int i = 0; i < ufsCount; i++)
+    {
+        if (!(ufs[i].code == sCode))
+            continue;
+
+        if (!ufs[i].deleted)
+        {
+            printShowUFHeader("UF encontrada!");
+            printShowUFUI(&ufs[i]);
+            printShowUFBorder();
+
+            printf("Pressione Enter para continuar...\n");
+            cleanerKeyboard();
+        }
+        else printf("UF com codigo %d nao encontrada.\n", sCode);
+
+        found = 1;
+        break;
+    }
+
+    if (!found)
+        printf("UF com codigo %d nao encontrada.\n", sCode);
 }
 
 // Utils
@@ -374,9 +341,15 @@ int getNextCode()
     return (ufs[ufsCount - 1].code + 1);
 }
 
-void printDefaultUFBorder()
+void printShowUFHeader(const char *header)
 {
+    printf("\n");
     printf("+--------------------------------------------------+\n");
+    printf("| %-48s |\n", header);
+    printShowUFBorder();
+    printf("| %-6s | %-6s | %-30s |\n",
+           "Codigo", "Sigla", "Descricao");
+    printShowUFBorder();
 }
 void printShowUFBorder()
 {
