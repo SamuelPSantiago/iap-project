@@ -20,8 +20,8 @@ void menuCitizen()
     printf("| 1 | INSERIR                                      |\n");
     printf("| 2 | ALTERAR                                      |\n");
     printf("| 3 | DELETAR                                      |\n");
-    printf("| 4 | LISTAR ESTADOS                               |\n");
-    printf("| 5 | MOSTRAR ESTADO                               |\n");
+    printf("| 4 | LISTAR PESSOAS                               |\n");
+    printf("| 5 | MOSTRAR PESSOA                               |\n");
     printf("| 0 | SAIR                                         |\n");
     printf("+---+----------------------------------------------+\n");
     printf("Escolha uma opcao: ");
@@ -116,7 +116,7 @@ void createCitizen()
     citizen tmp;
     memset(&tmp, 0, sizeof(citizen));
 
-    readCPF(&tmp, "Digite o CPF (11 digitos): *");
+    readCPFCitizen(&tmp, "Digite o CPF (11 digitos): *");
     if (searchCitizenByCPF(tmp.cpf) >= 0)
     {
         printf("CPF ja cadastrado.\n");
@@ -383,7 +383,7 @@ void pushCitizen(const citizen *p)
     citizens[citizensCount++] = *p;
 }
 
-void readCPF(citizen *tmp, const char *prompt)
+void readCPFCitizen(citizen *tmp, const char *prompt)
 {
     printf("%s", prompt);
     while (1)
@@ -473,11 +473,44 @@ void readBirthdate(citizen *tmp, const char *prompt)
         scanf("%10s", tmp->birthdate);
         cleanerKeyboard();
 
-        if (strlen(tmp->birthdate) == 10 && tmp->birthdate[4] == '-' && tmp->birthdate[7] == '-' &&
-            isdigit(tmp->birthdate[0]) && isdigit(tmp->birthdate[1]) && isdigit(tmp->birthdate[2]) &&
-            isdigit(tmp->birthdate[3]) && isdigit(tmp->birthdate[5]) && isdigit(tmp->birthdate[6]) &&
+        // Validate DD-MM-YYYY pattern
+        if (strlen(tmp->birthdate) == 10 &&
+            isdigit(tmp->birthdate[0]) && isdigit(tmp->birthdate[1]) &&
+            tmp->birthdate[2] == '-' &&
+            isdigit(tmp->birthdate[3]) && isdigit(tmp->birthdate[4]) &&
+            tmp->birthdate[5] == '-' &&
+            isdigit(tmp->birthdate[6]) && isdigit(tmp->birthdate[7]) &&
             isdigit(tmp->birthdate[8]) && isdigit(tmp->birthdate[9]))
-            break;
+        {
+            // Parse day, month, year
+            int day = (tmp->birthdate[0] - '0') * 10 + (tmp->birthdate[1] - '0');
+            int month = (tmp->birthdate[3] - '0') * 10 + (tmp->birthdate[4] - '0');
+            int year = (tmp->birthdate[6] - '0') * 1000
+                     + (tmp->birthdate[7] - '0') * 100
+                     + (tmp->birthdate[8] - '0') * 10
+                     + (tmp->birthdate[9] - '0');
+
+            // Determine days in month, accounting for leap year
+            int max_day = 0;
+            if (month >= 1 && month <= 12) {
+                switch (month) {
+                    case  1: case  3: case  5: case  7:
+                    case  8: case 10: case 12:
+                        max_day = 31; break;
+                    case  4: case  6: case  9: case 11:
+                        max_day = 30; break;
+                    case  2:
+                        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+                            max_day = 29;
+                        else
+                            max_day = 28;
+                        break;
+                }
+            }
+
+            // Final validity check: month 1-12 and day within range
+            if (month >= 1 && month <= 12 && day >= 1 && day <= max_day) break;
+        }
 
         printf("Data de nascimento invalida. Tente novamente: ");
     }

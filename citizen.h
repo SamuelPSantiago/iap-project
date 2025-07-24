@@ -11,7 +11,7 @@ typedef struct {
     char name[100];
     char phone[20]; // Phone number (including area code)
     char address[200];
-    char birthdate[11]; // Birth date in "YYYY-MM-DD" format
+    char birthdate[11]; // Birth date in "DD-MM-YYYY" format
     
     int deleted;
 } citizen;
@@ -35,7 +35,7 @@ void showCitizenByVoterNumber(); // Display a specific citizen by voter number
 // Utils
 void pushCitizen(const citizen *pushedCitizen); // Add a citizen to the in-memory array
 
-void readCPF(citizen *tmp, const char *prompt); // Read and validate the CPF
+void readCPFCitizen(citizen *tmp, const char *prompt); // Read and validate the CPF
 void readVoterNumber(citizen *tmp, const char *prompt); // Read and validate the title
 void readName(citizen *tmp, const char *prompt); // Read and validate the full name
 void readPhone(citizen *tmp, const char *prompt); // Read and validate the phone number

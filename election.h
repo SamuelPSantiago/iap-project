@@ -1,7 +1,7 @@
 #ifndef ELECTION_H
 #define ELECTION_H
 
-#include "uf.h"
+#include "UF.h"
 
 // File name for storing Election records
 #define FILENAMEELECTION "data/election.data"

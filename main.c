@@ -6,8 +6,9 @@
 
 #include "MAIN.h"
 #include "UF.h"
-#include "CITIZEN.h"
 #include "ELECTION.h"
+#include "CITIZEN.h"
+#include "CANDIDATE.h"
 
 int main() {
     menu();
@@ -15,6 +16,7 @@ int main() {
     loadUFs();
     loadElections();
     loadCitizens();
+    loadCandidates();
 
     int op;
     do {
@@ -35,6 +37,11 @@ int main() {
             case 3:
                 printf("\n");
                 stateMachineCitizen();
+                menu();
+                break;
+            case 4:
+                printf("\n");
+                stateMachineCandidate();
                 menu();
                 break;
             case 0:
@@ -91,4 +98,5 @@ void freeMemory() {
     freeUFs();
     freeElections();
     freeCitizens();
+    freeCandidates();
 }
