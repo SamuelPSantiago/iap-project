@@ -25,6 +25,7 @@ void menuUF()
     printf("| 5 | MOSTRAR ESTADO                               |\n");
     printf("| 0 | SAIR                                         |\n");
     printf("+---+----------------------------------------------+\n");
+    printf("Escolha uma opcao: ");
 }
 void stateMachineUF()
 {
@@ -38,6 +39,7 @@ void stateMachineUF()
             continue;
         }
         cleanerKeyboard();
+        printf("\n");
 
         switch (op)
         {
@@ -83,9 +85,12 @@ void loadUFs()
 
     uf tmp;
     int maxCode = 0;
-    while (fread(&tmp, sizeof(uf), 1, f) == 1) {
-        if (tmp.code > maxCode) maxCode = tmp.code;
-        if (!tmp.deleted) pushUF(&tmp);
+    while (fread(&tmp, sizeof(uf), 1, f) == 1)
+    {
+        if (tmp.code > maxCode)
+            maxCode = tmp.code;
+        if (!tmp.deleted)
+            pushUF(&tmp);
     }
 
     fclose(f);
@@ -117,7 +122,6 @@ void createUF()
     memset(&tmp, 0, sizeof(tmp));
     tmp.code = getNextCode();
 
-    printf("\n");
     readAcronym(&tmp, -1, "Digite a sigla da UF (2 letras) *: ");
     readDescription(&tmp, "Digite a descricao da UF: ");
 
@@ -139,19 +143,54 @@ void updateUF()
     printf("Digite o codigo do UF que deseja editar: ");
     scanf("%d", &tmp.code);
     cleanerKeyboard();
-    printf("\n");
 
     int ufIndex = searchUF(tmp.code);
     if (ufIndex < 0)
     {
-        printf("O UF com codigo %d nao existe ou foi deletado \n\n", tmp.code);
+        printf("UF com codigo %d nao encontrada.\n\n", tmp.code);
         return;
     }
 
     tmp = ufs[ufIndex];
 
-    readAcronym(&tmp, ufIndex, "Digite a nova sigla: ");
-    readDescription(&tmp, "Digite a nova descricao: ");
+    int op;
+    do
+    {
+        printShowUFHeader("UF sendo editada:");
+        printShowUFUI(&tmp);
+        printShowUFBorder();
+
+        printf("\n");
+
+        printf("+--------------------------------------------------+\n");
+        printf("| Menu de edicao                                   |\n");
+        printf("+---+----------------------------------------------+\n");
+        printf("| 1 | SIGLA                                        |\n");
+        printf("| 2 | DESCRICAO                                    |\n");
+        printf("| 0 | CONCLUIR EDICAO                              |\n");
+        printf("+---+----------------------------------------------+\n");
+        printf("Escolha uma opcao: ");
+
+        scanf("%d", &op);
+        cleanerKeyboard();
+        printf("\n");
+
+        switch (op)
+        {
+            case 1:
+                readAcronym(&tmp, tmp.code, "Digite a nova sigla (2 letras): ");
+                break;
+            case 2:
+                readDescription(&tmp, "Digite a nova descricao: ");
+                break;
+            case 0:
+                break;
+            default:
+                printf("Opcao invalida. Tente novamente.\n");
+        }
+
+        printf("\n");
+    } while (op != 0);
 
     ufs[ufIndex] = tmp;
     ufsModified = 1;
@@ -167,7 +206,7 @@ void deleteUF()
 {
     int dCode;
 
-    printf("\nDigite o codigo da UF que deseja excluir: ");
+    printf("Digite o codigo da UF que deseja excluir: ");
     scanf("%d", &dCode);
     cleanerKeyboard();
 
@@ -221,7 +260,7 @@ void showUF()
             printShowUFUI(&ufs[i]);
 
     printShowUFBorder();
-    
+
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
@@ -234,7 +273,7 @@ void showSpecificUF()
     }
 
     int sCode;
-    printf("\nDigite o codigo da UF que deseja ver: ");
+    printf("Digite o codigo da UF que deseja ver: ");
     scanf("%d", &sCode);
     cleanerKeyboard();
     printf("\n");
@@ -254,7 +293,8 @@ void showSpecificUF()
             printf("Pressione Enter para continuar...\n");
             cleanerKeyboard();
         }
-        else printf("UF com codigo %d nao encontrada.\n", sCode);
+        else
+            printf("UF com codigo %d nao encontrada.\n", sCode);
 
         found = 1;
         break;
@@ -287,13 +327,14 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
 {
     char buf[32];
     size_t len;
-    int ch, invalid;
+    int invalid;
 
     do
     {
         invalid = 0;
         printf("%s", prompt);
 
+        // Get input
         if (fgets(buf, sizeof(buf), stdin) == NULL)
         {
             printf("Erro ao ler entrada! Tente novamente.\n\n");
@@ -301,20 +342,34 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
             continue;
         }
 
+        // Remove newline
         len = strcspn(buf, "\n");
-        if (buf[len] != '\n')
-            while ((ch = getchar()) != '\n' && ch != EOF)
-                ;
+        if (buf[len] != '\n') cleanerKeyboard();
         else buf[len] = '\0';
 
-        if (len != 2)
+        if (len != 2) // Check if length is exactly 2
         {
             printf("Sigla deve ter exatamente 2 letras!\n\n");
             invalid = 1;
             continue;
         }
 
-        strncpy(tmp->acronym, buf, 3);
+        // Check if character is a letter
+        for (int i = 0; i < 2; i++)
+        {
+            if (!isalpha((unsigned char)buf[i]))
+            {
+                printf("Sigla deve conter apenas letras! Tente novamente.\n\n");
+                invalid = 1;
+                break;
+            }
+        }
+        if (invalid) continue;
+
+        // Convert to uppercase and set acronym
+        tmp->acronym[0] = toupper((unsigned char)buf[0]);
+        tmp->acronym[1] = toupper((unsigned char)buf[1]);
+        tmp->acronym[2] = '\0';
 
         int codeAcronym = searchAcronym(tmp->acronym);
         if (codeAcronym != -1 && codeAcronym != ufIndex)
@@ -323,7 +378,6 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
             invalid = 1;
             continue;
         }
-
     } while (invalid);
 }
 void readDescription(uf *tmp, const char *prompt)
@@ -357,7 +411,6 @@ int getNextCode()
 
 void printShowUFHeader(const char *header)
 {
-    printf("\n");
     printf("+--------------------------------------------------+\n");
     printf("| %-48s |\n", header);
     printShowUFBorder();
@@ -378,4 +431,13 @@ void printShowUFUI(const uf *p)
            p->code,
            p->acronym,
            description);
+}
+
+void freeUFs()
+{
+    free(ufs);
+    ufs = NULL;
+    ufsCount = 0;
+    ufsCapacity = 0;
+    ufsModified = 0;
 }

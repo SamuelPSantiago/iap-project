@@ -7,9 +7,14 @@
 #include "MAIN.h"
 #include "UF.h"
 #include "CITIZEN.h"
+#include "ELECTION.h"
 
 int main() {
     menu();
+
+    loadUFs();
+    loadElections();
+    loadCitizens();
 
     int op;
     do {
@@ -19,13 +24,16 @@ int main() {
         switch (op) {
             case 1:
                 printf("\n");
-                loadUFs();
                 stateMachineUF();
+                menu();
+                break;
+            case 2:
+                printf("\n");
+                stateMachineElection();
                 menu();
                 break;
             case 3:
                 printf("\n");
-                loadCitizens();
                 stateMachineCitizen();
                 menu();
                 break;
@@ -50,6 +58,7 @@ void menu()
     printf("| 6 | RESULTADO                                    |\n");
     printf("| 0 | SAIR                                         |\n");
     printf("+---+----------------------------------------------+\n");
+    printf("Escolha uma opcao: ");
 }
 void ensureDataDir()
 {
@@ -77,4 +86,9 @@ void formatBigString(const char *str, size_t width, char *outBuf, size_t outBufS
         memset(outBuf, '.', dots);
         outBuf[dots] = '\0';
     } else snprintf(outBuf, outBufSize, "%s", str);
+}
+void freeMemory() {
+    freeUFs();
+    freeElections();
+    freeCitizens();
 }

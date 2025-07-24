@@ -43,4 +43,6 @@ void printShowUFHeader(const char *header); // Print the header for showing UFs
 void printShowUFBorder(); // Print the border for showing UFs
 void printShowUFUI(const uf *p); // Print the UI for showing a UF
 
+void freeUFs(); // Free the allocated memory for UFs
+
 #endif

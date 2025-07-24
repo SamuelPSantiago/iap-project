@@ -24,6 +24,7 @@ void menuCitizen()
     printf("| 5 | MOSTRAR ESTADO                               |\n");
     printf("| 0 | SAIR                                         |\n");
     printf("+---+----------------------------------------------+\n");
+    printf("Escolha uma opcao: ");
 }
 void stateMachineCitizen()
 {
@@ -37,6 +38,7 @@ void stateMachineCitizen()
             continue;
         }
         cleanerKeyboard();
+        printf("\n");
 
         switch (op)
         {
@@ -145,7 +147,7 @@ void updateCitizen()
 {
     citizen tmp;
 
-    printf("\nDigite o CPF do citizen que deseja alterar: ");
+    printf("Digite o CPF do citizen que deseja alterar: ");
     scanf("%12s", tmp.cpf);
     cleanerKeyboard();
 
@@ -163,16 +165,66 @@ void updateCitizen()
     int index = searchCitizenByCPF(tmp.cpf);
     if (index < 0)
     {
-        printf("Citizen com CPF %s nao encontrado.\n\n", tmp.cpf);
+        printf("Pessoa com CPF %s nao encontrada.\n\n", tmp.cpf);
         return;
     }
 
     tmp = citizens[index];
 
-    readPhone(&tmp, "Digite o novo telefone: ");
-    readAddress(&tmp, "Digite o novo endereco: ");
-    readBirthdate(&tmp, "Digite a nova data de nascimento (YYYY-MM-DD): ");
+    int op;
+    do
+    {
+        printShowCitizenHeader("Pessoa sendo editada:");
+        printShowCitizenUI(&tmp);
+        printShowCitizenBorder();
 
+        printf("\n");
+
+        printf("+--------------------------------------------------+\n");
+        printf("| Menu de edicao                                   |\n");
+        printf("+---+----------------------------------------------+\n");
+        printf("| 1 | Titulo de Eleitor                            |\n");
+        printf("| 2 | Nome                                         |\n");
+        printf("| 3 | Telefone                                     |\n");
+        printf("| 4 | Endereco                                     |\n");
+        printf("| 5 | Data de Nascimento                           |\n");
+        printf("| 0 | CONCLUIR EDICAO                              |\n");
+        printf("+---+----------------------------------------------+\n");
+
+        scanf("%d", &op);
+        cleanerKeyboard();
+        printf("\n");
+
+        switch (op)
+        {
+            case 1:
+                readVoterNumber(&tmp, "Digite o novo titulo de eleitor: ");
+                if (searchCitizenByVoterNumber(tmp.voterNumber) >= 0)
+                {
+                    printf("Houve um problema! Titulo ja cadastrado.\n");
+                    continue;
+                }
+                break;
+            case 2:
+                readName(&tmp, "Digite o novo nome completo: ");
+                break;
+            case 3:
+                readPhone(&tmp, "Digite o novo telefone (com DDD): ");
+                break;
+            case 4:
+                readAddress(&tmp, "Digite o novo endereco: ");
+                break;
+            case 5:
+                readBirthdate(&tmp, "Digite a nova data de nascimento (YYYY-MM-DD): ");
+                break;
+            case 0:
+                break;
+            default:
+                printf("Opcao invalida. Tente novamente.\n");
+        }
+    } while (op != 0);
+
+    citizens[index] = tmp;
     citizensModified = 1;
 
     printShowCitizenHeader("Pessoa atualizada com sucesso!");
@@ -186,7 +238,7 @@ void deleteCitizen()
 {
     char cpf[12];
 
-    printf("\nDigite o CPF da pessoa que deseja deletar: ");
+    printf("Digite o CPF da pessoa que deseja deletar: ");
     scanf("%12s", cpf);
     cleanerKeyboard();
 
@@ -423,7 +475,6 @@ int searchCitizenByVoterNumber(const char *voterNumber)
 
 void printShowCitizenHeader(const char *header)
 {
-    printf("\n");
     printf("+----------------------------------------------------------------------------------------------------------------------------+\n");
     printf("| %-122s |\n", header);
     printShowCitizenBorder();
@@ -450,4 +501,13 @@ void printShowCitizenUI(const citizen *p)
            p->phone,
            address,
            p->birthdate);
+}
+
+void freeCitizens()
+{
+    free(citizens);
+    citizens = NULL;
+    citizensCount = 0;
+    citizensCapacity = 0;
+    citizensModified = 0;
 }
