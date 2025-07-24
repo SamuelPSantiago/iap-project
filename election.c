@@ -69,10 +69,13 @@ void stateMachineElection()
 void loadElections()
 {
     ensureDataDir();
+    errno = 0; // Reset errno to check for errors later
     FILE *f = fopen(FILENAMEELECTION, "rb");
     if (!f)
     {
-        printf("Erro ao carregar eleicoes de %s\n", FILENAMEELECTION);
+        if (errno != ENOENT)
+            printf("Erro ao abrir arquivo de eleicoes: %s\n", strerror(errno)); // Print error if not file not found
+            
         return;
     }
 

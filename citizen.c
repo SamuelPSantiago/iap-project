@@ -71,10 +71,13 @@ void stateMachineCitizen()
 void loadCitizens()
 {
     ensureDataDir();
+    errno = 0; // Reset errno to check for errors later
     FILE *f = fopen(FILENAMECITIZEN, "rb");
     if (!f)
     {
-        printf("Erro ao carregar pessoas de %s\n", FILENAMECITIZEN);
+        if (errno != ENOENT)
+            printf("Erro ao abrir arquivo de pessoas: %s\n", strerror(errno)); // Print error if not file not found
+         
         return;
     }
 

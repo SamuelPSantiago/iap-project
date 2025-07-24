@@ -72,10 +72,13 @@ void stateMachineUF()
 void loadUFs()
 {
     ensureDataDir();
+    errno = 0; // Reset errno to check for errors later
     FILE *f = fopen(FILENAMEUF, "rb");
     if (!f)
     {
-        printf("Erro ao carregar pessoas de %s\n", FILENAMEUF);
+        if (errno != ENOENT)
+            printf("Erro ao abrir arquivo de UFs: %s\n", strerror(errno)); // Print error if not file not found
+         
         return;
     }
 
