@@ -55,7 +55,7 @@ void stateMachineCitizen()
             showCitizen();
             break;
         case 5:
-            showSpecificCitizen();
+            showCitizenByVoterNumber();
             break;
         case 0:
             saveCitizens();
@@ -101,7 +101,7 @@ void saveCitizens()
     FILE *f = fopen(FILENAMECITIZEN, "wb");
     if (!f)
     {
-        printf("Erro ao salvar citizens em %s\n", FILENAMECITIZEN);
+        printf("Erro ao salvar pessoas em %s\n", FILENAMECITIZEN);
         return;
     }
 
@@ -116,24 +116,24 @@ void createCitizen()
     citizen tmp;
     memset(&tmp, 0, sizeof(citizen));
 
-    readCPF(&tmp, "Digite o CPF (11 digitos): ");
+    readCPF(&tmp, "Digite o CPF (11 digitos): *");
     if (searchCitizenByCPF(tmp.cpf) >= 0)
     {
         printf("CPF ja cadastrado.\n");
         return;
     }
 
-    readVoterNumber(&tmp, "Digite o titulo de eleitor: ");
+    readVoterNumber(&tmp, "Digite o titulo de eleitor: *");
     if (searchCitizenByVoterNumber(tmp.voterNumber) >= 0)
     {
         printf("Titulo ja cadastrado.\n");
         return;
     }
 
-    readName(&tmp, "Digite o nome completo: ");
+    readName(&tmp, "Digite o nome completo: *");
     readPhone(&tmp, "Digite o telefone (com DDD): ");
     readAddress(&tmp, "Digite o endereco: ");
-    readBirthdate(&tmp, "Digite a data de nascimento (YYYY-MM-DD): ");
+    readBirthdate(&tmp, "Digite a data de nascimento (DD-MM-YYYY): *");
 
     tmp.deleted = 0;
     pushCitizen(&tmp);
@@ -150,7 +150,7 @@ void updateCitizen()
 {
     citizen tmp;
 
-    printf("Digite o CPF do citizen que deseja alterar: ");
+    printf("Digite o CPF da pessoa que deseja alterar: ");
     scanf("%12s", tmp.cpf);
     cleanerKeyboard();
 
@@ -186,11 +186,10 @@ void updateCitizen()
         printf("+--------------------------------------------------+\n");
         printf("| Menu de edicao                                   |\n");
         printf("+---+----------------------------------------------+\n");
-        printf("| 1 | Titulo de Eleitor                            |\n");
-        printf("| 2 | Nome                                         |\n");
-        printf("| 3 | Telefone                                     |\n");
-        printf("| 4 | Endereco                                     |\n");
-        printf("| 5 | Data de Nascimento                           |\n");
+        printf("| 2 | NOME                                         |\n");
+        printf("| 3 | TELEFONE                                     |\n");
+        printf("| 4 | ENDERECO                                     |\n");
+        printf("| 5 | DATA DE NASCIMENTO                           |\n");
         printf("| 0 | CONCLUIR EDICAO                              |\n");
         printf("+---+----------------------------------------------+\n");
 
@@ -201,24 +200,16 @@ void updateCitizen()
         switch (op)
         {
             case 1:
-                readVoterNumber(&tmp, "Digite o novo titulo de eleitor: ");
-                if (searchCitizenByVoterNumber(tmp.voterNumber) >= 0)
-                {
-                    printf("Houve um problema! Titulo ja cadastrado.\n");
-                    continue;
-                }
+                readName(&tmp, "Digite o novo nome completo: *");
                 break;
             case 2:
-                readName(&tmp, "Digite o novo nome completo: ");
-                break;
-            case 3:
                 readPhone(&tmp, "Digite o novo telefone (com DDD): ");
                 break;
-            case 4:
+            case 3:
                 readAddress(&tmp, "Digite o novo endereco: ");
                 break;
-            case 5:
-                readBirthdate(&tmp, "Digite a nova data de nascimento (YYYY-MM-DD): ");
+            case 4:
+                readBirthdate(&tmp, "Digite a nova data de nascimento (DD-MM-YYYY): *");
                 break;
             case 0:
                 break;
@@ -284,7 +275,7 @@ void showCitizen()
 {
     if (citizensCount == 0)
     {
-        printf("Nenhum citizen cadastrado.\n");
+        printf("Nenhuma pessoa cadastrada.\n");
         return;
     }
 
@@ -299,7 +290,7 @@ void showCitizen()
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
-void showSpecificCitizen()
+void showCitizenByCPF()
 {
     if (citizensCount == 0)
     {
@@ -321,7 +312,7 @@ void showSpecificCitizen()
         
         if(!citizens[i].deleted)
         {
-            printShowCitizenHeader("UF encontrada!");
+            printShowCitizenHeader("Dados da pessoa:");
             printShowCitizenUI(&citizens[i]);
             printShowCitizenBorder();
 
@@ -336,6 +327,41 @@ void showSpecificCitizen()
 
     if (!found)
         printf("Pessoa com CPF %s nao encontrada\n", cpf);
+}
+void showCitizenByVoterNumber()
+{
+    if (citizensCount == 0)
+    {
+        printf("Nenhuma pessoa cadastrada.\n");
+        return;
+    }
+
+    char title[14];
+    printf("\nDigite o titulo de eleitor da pessoa que deseja ver: ");
+    scanf("%13s", title);
+    cleanerKeyboard();
+    printf("\n");
+
+    int idx = searchCitizenByVoterNumber(title);
+    if (idx < 0)
+    {
+        printf("Pessoa com titulo %s nao encontrada.\n", title);
+        return;
+    }
+
+    if (!citizens[idx].deleted)
+    {
+        printShowCitizenHeader("Dados da pessoa:");
+        printShowCitizenUI(&citizens[idx]);
+        printShowCitizenBorder();
+    } 
+    else
+    {
+        printf("Pessoa com titulo %s nao encontrada.\n", title);
+    }
+
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
 }
 
 // Utils

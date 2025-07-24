@@ -29,7 +29,8 @@ void createCitizen(); // Create a new citizen
 void updateCitizen(); // Update an existing citizen
 void deleteCitizen(); // Mark a citizen as deleted
 void showCitizen(); // Display all active citizens
-void showSpecificCitizen(); // Display a specific citizen by CPF
+void showCitizenByCPF(); // Display a specific citizen by CPF
+void showCitizenByVoterNumber(); // Display a specific citizen by voter number
 
 // Utils
 void pushCitizen(const citizen *pushedCitizen); // Add a citizen to the in-memory array

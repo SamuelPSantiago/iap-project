@@ -16,31 +16,31 @@ typedef struct {
 } election;
 
 // Menu controllers
-void menuElection();
-void stateMachineElection();
+void menuElection(); // Display the election menu
+void stateMachineElection(); // State machine for election operations
 
 // File Management
-void loadElections();
-void saveElections();
+void loadElections(); // Load elections from file
+void saveElections(); // Save elections to file
 
 // CRUD functions
-void createElection();
-void updateElection();
-void deleteElection();
-void listElections();
-void viewElection();
+void createElection(); // Create a new election
+void updateElection(); // Update an existing election
+void deleteElection(); // Delete an election
+void listElections(); // List all elections
+void viewElection(); // View details of a specific election
 
 // Utils
-void pushElection(const election *item);
-void readElectionYear(int *year, const char *prompt);
-void readElectionUfCode(int *ufCode, const char *prompt);
-void readElectionDescription(election *item, const char *prompt);
-int findElectionIndex(int year, int ufCode);
+void pushElection(const election *item); // Add an election to the list
+void readElectionYear(int *year, const char *prompt); // Read election year from user input
+void readElectionUfCode(int *ufCode, const char *prompt); // Read UF code for the election from user input
+void readElectionDescription(election *item, const char *prompt); // Read election description from user input
+int findElectionIndex(int year, int ufCode); // Find the index of an election by year and UF code
 
-void printElectionHeader(const char *title);
-void printElectionBorder();
-void printElectionRow(const election *item);
+void printElectionHeader(const char *title); // Print header for election records
+void printElectionBorder(); // Print header for election records
+void printElectionRow(const election *item); // Print a single election record
 
-void freeElections();
+void freeElections(); // Free memory allocated for elections
 
 #endif
