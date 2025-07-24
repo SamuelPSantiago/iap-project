@@ -118,7 +118,7 @@ void createUF()
     tmp.code = getNextCode();
 
     printf("\n");
-    readAcronym(&tmp, -1, "Digite a sigla da UF (2 letras): ");
+    readAcronym(&tmp, -1, "Digite a sigla da UF (2 letras) *: ");
     readDescription(&tmp, "Digite a descricao da UF: ");
 
     tmp.deleted = 0;
@@ -305,8 +305,7 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
         if (buf[len] != '\n')
             while ((ch = getchar()) != '\n' && ch != EOF)
                 ;
-        else
-            buf[len] = '\0';
+        else buf[len] = '\0';
 
         if (len != 2)
         {

@@ -109,6 +109,7 @@ void saveCitizens()
 void createCitizen()
 {
     citizen tmp;
+    memset(&tmp, 0, sizeof(citizen));
 
     readCPF(&tmp, "Digite o CPF (11 digitos): ");
     if (searchCitizenByCPF(tmp.cpf) >= 0)
