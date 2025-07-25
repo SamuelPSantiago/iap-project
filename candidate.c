@@ -93,8 +93,7 @@ void loadCandidates()
 }
 void saveCandidates()
 {
-    if (!candidatesModified)
-        return;
+    if (!candidatesModified) return;
 
     ensureDataDir();
     FILE *f = fopen(FILENAMECANDIDATE, "wb");

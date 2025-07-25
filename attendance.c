@@ -1,142 +1,101 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <errno.h>
 
-#include "MAIN.h"
-#include "UF.h"
-#include "ELECTION.h"
-#include "CITIZEN.h"
+#include "MAIN.H"
 #include "ATTENDANCE.h"
 
 static attendance *attendances = NULL;
-static int attendCount = 0;
-static int attendCapacity = 0;
+static int attendancesCount = 0;
+static int attendancesCapacity = 0;
+static int attendancesModified = 0;
 
-void loadAttendance()
+// File management
+void loadAttendances()
 {
     ensureDataDir();
     errno = 0;
     FILE *f = fopen(FILENAMEATTENDANCE, "rb");
-    if (!f)
-    {
+    if (!f) {
         if (errno != ENOENT)
-            printf("Erro ao abrir arquivo de comparecimento: %s\n", strerror(errno));
+            printf("Erro ao abrir arquivo de comparecimentos: %s\n", strerror(errno));
         return;
     }
 
     free(attendances);
     attendances = NULL;
-    attendCount = attendCapacity = 0;
+    attendancesCount = attendancesCapacity = 0;
 
     attendance tmp;
     while (fread(&tmp, sizeof(attendance), 1, f) == 1)
         pushAttendance(&tmp);
 
     fclose(f);
+    attendancesModified = 0;
 }
-
-void showAttendanceCountByUFAndYear()
+void saveAttendances()
 {
-    if (!attendCount)
-    {
-        printf("Nenhum registro de comparecimento.\n");
+    if (!attendancesModified) return;
+
+    ensureDataDir();
+    FILE *f = fopen(FILENAMEATTENDANCE, "wb");
+    if (!f) {
+        printf("Erro ao salvar comparecimentos em %s\n", FILENAMEATTENDANCE);
         return;
     }
 
-    int year, uf;
-    printf("Digite o ano da eleicao: ");
-    scanf("%d", &year);
-    cleanerKeyboard();
-    if (searchElectionByYear(year) < 0)
-    {
-        printf("Nao existe nenhuma eleicao nesse ano!\n");
-        return;
-    }
-
-    printf("Digite o codigo da UF:");
-    scanf("%d", &uf);
-    cleanerKeyboard();
-    if (findElectionIndex(year, uf) < 0)
-    {
-        printf("No ano selecionado, essa UF nao possui eleicao cadastrada!\n");
-        return;
-    }
-
-    int cnt = 0;
-    for (int i = 0; i < attendCount; i++)
-        if (attendances[i].year == year && attendances[i].ufCode == uf)
-            cnt++;
-
-    printf("\nTotal de comparecimentos no ano %d UF %d: %d\n", year, uf, cnt);
-}
-void showAttendanceByYear()
-{
-    if (!attendCount)
-    {
-        printf("Nenhum registro de comparecimento.\n");
-        return;
-    }
-    int year;
-
-    printf("Digite o ano da eleicao: ");
-    scanf("%d", &year);
-    cleanerKeyboard();
-    if (searchElectionByYear(year) < 0)
-    {
-        printf("Nao existe nenhuma eleicao nesse ano!\n");
-        return;
-    }
-
-    int *idxs = malloc(attendCount * sizeof(int)), cnt = 0;
-    for (int i = 0; i < attendCount; i++)
-        if (attendances[i].year == year)
-            idxs[cnt++] = i;
-
-    if (!cnt)
-    {
-        printf("Nenhum comparecimento para ano %d.\n", year);
-        free(idxs);
-        return;
-    }
-
-    for (int i = 0; i < cnt - 1; i++)
-        for (int j = i + 1; j < cnt; j++)
-            if (attendances[idxs[i]].ufCode > attendances[idxs[j]].ufCode)
-            {
-                int t = idxs[i];
-                idxs[i] = idxs[j];
-                idxs[j] = t;
-            }
-
-    printf("\nComparecimentos no ano %d ordenados por UF:\n", year);
-    printf("+------+----+-------------+\n");
-    printf("| %-4s | %-3s | %-11s |\n", "Ano", "UF", "CPF");
-    printf("+------+----+-------------+\n");
-
-    for (int k = 0; k < cnt; k++)
-    {
-        int i = idxs[k];
-        printf("| %-4d | %-3d | %-11s |\n",
-               attendances[i].year, attendances[i].ufCode, attendances[i].cpf);
-    }
-
-    printf("+------+----+-------------+\n");
-    free(idxs);
+    fwrite(attendances, sizeof(attendance), attendancesCount, f);
+    fclose(f);
+    attendancesModified = 0;
 }
 
+// Utils
 void pushAttendance(const attendance *a)
 {
-    if (attendCount >= attendCapacity)
-    {
-        attendCapacity = attendCapacity ? attendCapacity + 10 : 10;
-        attendance *tmp = realloc(attendances, attendCapacity * sizeof(attendance));
-        if (!tmp)
-        {
-            printf("Erro alocar memoria comparecimento\n");
+    if (attendancesCount >= attendancesCapacity) {
+        attendancesCapacity = attendancesCapacity ? attendancesCapacity + 10 : 10;
+        attendance *tmp = realloc(attendances, attendancesCapacity * sizeof(attendance));
+        if (!tmp) {
+            printf("Erro ao alocar comparecimentos\n");
             exit(-1);
         }
         attendances = tmp;
     }
-    attendances[attendCount++] = *a;
+    attendances[attendancesCount++] = *a;
+    attendancesModified = 1;
+}
+int hasAlreadyVoted(const char *cpf, int year, int ufCode)
+{
+    for (int i = 0; i < attendancesCount; i++)
+        if (strcmp(attendances[i].cpf, cpf) == 0 &&
+            attendances[i].year == year &&
+            attendances[i].ufCode == ufCode)
+            return 1;
+    return 0;
+}
+void registerAttendance(const char *cpf, int year, int ufCode)
+{
+    attendance a;
+    strncpy(a.cpf, cpf, sizeof(a.cpf));
+    a.year = year;
+    a.ufCode = ufCode;
+    pushAttendance(&a);
+}
+void showAttendanceCount()
+{
+    int year, uf;
+    printf("Digite o ano da eleicao: ");
+    scanf("%d", &year);
+    printf("Digite o codigo da UF: ");
+    scanf("%d", &uf);
+    cleanerKeyboard();
+
+    int count = 0;
+    for (int i = 0; i < attendancesCount; i++)
+        if (attendances[i].year == year && attendances[i].ufCode == uf)
+            count++;
+
+    printf("Comparecimentos em %d na UF %d: %d\n", year, uf, count);
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
 }

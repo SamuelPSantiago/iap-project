@@ -1,24 +1,20 @@
 #ifndef ATTENDANCE_H
 #define ATTENDANCE_H
 
-// File name for storing attendance records
 #define FILENAMEATTENDANCE "data/attendance.data"
 
-// Attendance schema
 typedef struct {
-    char cpf[12]; // Citizen CPF (11 digits + '\0')
-    int  year; // Election year
-    int  ufCode; // UF code
+    char cpf[12];
+    int year;
+    int ufCode;
 } attendance;
 
-// File management
-void loadAttendance(); // Load attendance from file
+void loadAttendances();
+void saveAttendances();
+void pushAttendance(const attendance *a);
 
-// Display functions
-void showAttendanceCountByUFAndYear(); // Count attendance by UF and year
-void showAttendanceByYear(); // List attendance by year ordered by UF
-
-// Utils
-void pushAttendance(const attendance *a); // Add to in-memory array
+int hasAlreadyVoted(const char *cpf, int year, int ufCode);
+void registerAttendance(const char *cpf, int year, int ufCode);
+void showAttendanceCount();
 
 #endif

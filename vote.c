@@ -108,6 +108,9 @@ void createVote()
     vote tmp;
     memset(&tmp, 0, sizeof(tmp));
 
+    char cpf[12];
+    readCPF(cpf, "Digite seu CPF: ");
+
     readYearVote(&tmp, "Digite o ano da eleicao: ");
     if (searchElectionByYear(tmp.year) < 0)
     {
@@ -121,6 +124,14 @@ void createVote()
     if (findElectionIndex(tmp.year, tmp.ufCode) < 0)
     {
         printf("\nNo ano selecionado, essa UF nao possui eleicao cadastrada!\n");
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
+        return;
+    }
+
+    if (hasAlreadyVoted(cpf, tmp.year, tmp.ufCode))
+    {
+        printf("\nEsse CPF ja votou nessa eleicao nessa UF.\n");
         printf("Pressione Enter para continuar...\n");
         cleanerKeyboard();
         return;
@@ -158,6 +169,7 @@ void createVote()
 
     setCurrentDateTime(&tmp);
     pushVote(&tmp);
+    registerAttendance(cpf, tmp.year, tmp.ufCode);
     votesModified = 1;
 
     printf("\nVoto confirmado!\n");
