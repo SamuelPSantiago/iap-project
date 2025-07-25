@@ -62,7 +62,7 @@ void stateMachineUF()
             saveUFs();
             break;
         default:
-            printf("Escolha uma opção válida.\n");
+            printf("Opcao invalida. Tente novamente:");
             break;
         }
     } while (op != 0);
@@ -78,7 +78,7 @@ void loadUFs()
     {
         if (errno != ENOENT)
             printf("Erro ao abrir arquivo de UFs: %s\n", strerror(errno)); // Print error if not file not found
-         
+
         return;
     }
 
@@ -180,16 +180,16 @@ void updateUF()
 
         switch (op)
         {
-            case 1:
-                readAcronym(&tmp, tmp.code, "Digite a nova sigla (2 letras): ");
-                break;
-            case 2:
-                readDescription(&tmp, "Digite a nova descricao: ");
-                break;
-            case 0:
-                break;
-            default:
-                printf("Opcao invalida. Tente novamente.\n");
+        case 1:
+            readAcronym(&tmp, tmp.code, "Digite a nova sigla (2 letras): ");
+            break;
+        case 2:
+            readDescription(&tmp, "Digite a nova descricao: ");
+            break;
+        case 0:
+            break;
+        default:
+            printf("Opcao invalida. Tente novamente.\n");
         }
 
         printf("\n");
@@ -347,8 +347,10 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
 
         // Remove newline
         len = strcspn(buf, "\n");
-        if (buf[len] != '\n') cleanerKeyboard();
-        else buf[len] = '\0';
+        if (buf[len] != '\n')
+            cleanerKeyboard();
+        else
+            buf[len] = '\0';
 
         if (len != 2) // Check if length is exactly 2
         {
@@ -367,7 +369,8 @@ void readAcronym(uf *tmp, const int ufIndex, const char *prompt)
                 break;
             }
         }
-        if (invalid) continue;
+        if (invalid)
+            continue;
 
         // Convert to uppercase and set acronym
         tmp->acronym[0] = toupper((unsigned char)buf[0]);

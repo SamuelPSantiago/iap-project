@@ -10,7 +10,7 @@
 #include "CITIZEN.h"
 
 static candidate *candidates = NULL;
-static int candidatesCount  = 0;
+static int candidatesCount = 0;
 static int candidatesCapacity = 0;
 static int candidatesModified = 0;
 
@@ -31,22 +31,37 @@ void menuCandidate()
 void stateMachineCandidate()
 {
     int op;
-    do {
+    do
+    {
         menuCandidate();
-        if (scanf("%d", &op) != 1) {
+        if (scanf("%d", &op) != 1)
+        {
             cleanerKeyboard();
             continue;
         }
         cleanerKeyboard();
         printf("\n");
 
-        switch (op) {
-            case 1: createCandidate();             break;
-            case 2: deleteCandidate();             break;
-            case 3: showCandidatesByUFAndYear();   break;
-            case 4: showCandidatesByYear();        break;
-            case 0: saveCandidates();              break;
-            default: printf("Escolha uma opcao valida.\n"); break;
+        switch (op)
+        {
+        case 1:
+            createCandidate();
+            break;
+        case 2:
+            deleteCandidate();
+            break;
+        case 3:
+            showCandidatesByUFAndYear();
+            break;
+        case 4:
+            showCandidatesByYear();
+            break;
+        case 0:
+            saveCandidates();
+            break;
+        default:
+            printf("Opcao invalida. Tente novamente:");
+            break;
         }
     } while (op != 0);
 }
@@ -57,7 +72,8 @@ void loadCandidates()
     ensureDataDir();
     errno = 0;
     FILE *f = fopen(FILENAMECANDIDATE, "rb");
-    if (!f) {
+    if (!f)
+    {
         if (errno != ENOENT)
             printf("Erro ao abrir arquivo de candidatos: %s\n", strerror(errno));
         return;
@@ -82,7 +98,8 @@ void saveCandidates()
 
     ensureDataDir();
     FILE *f = fopen(FILENAMECANDIDATE, "wb");
-    if (!f) {
+    if (!f)
+    {
         printf("Erro ao salvar candidatos em %s\n", FILENAMECANDIDATE);
         return;
     }
@@ -100,18 +117,21 @@ void createCandidate()
 
     readYear(&tmp, "Digite o ano da eleicao: *");
     readUFCode(&tmp, "Digite o codigo da UF: *");
-    if (searchUF(tmp.ufCode) < 0) {
+    if (searchUF(tmp.ufCode) < 0)
+    {
         printf("Codigo de UF nao encontrado.\n");
         return;
     }
 
     readCPFCandidate(&tmp, "Digite o CPF do candidato (11 digitos): *");
-    if (searchCitizenByCPF(tmp.cpf) < 0) {
+    if (searchCitizenByCPF(tmp.cpf) < 0)
+    {
         printf("CPF nao encontrado.\n");
         return;
     }
 
-    if (searchCandidateByPK(tmp.year, tmp.ufCode, tmp.cpf) >= 0) {
+    if (searchCandidateByPK(tmp.year, tmp.ufCode, tmp.cpf) >= 0)
+    {
         printf("Candidato ja cadastrado.\n");
         return;
     }
@@ -128,8 +148,8 @@ void createCandidate()
 }
 void deleteCandidate()
 {
-    int  year;
-    int  uf;
+    int year;
+    int uf;
     char cpf[12];
 
     printf("Digite o ano da eleicao: ");
@@ -145,7 +165,8 @@ void deleteCandidate()
     cleanerKeyboard();
 
     int idx = searchCandidateByPK(year, uf, cpf);
-    if (idx < 0) {
+    if (idx < 0)
+    {
         printf("Candidato nao encontrado.\n");
         return;
     }
@@ -153,7 +174,8 @@ void deleteCandidate()
     printf("Tem certeza que deseja excluir? (s/N): ");
     int ch = getchar();
     cleanerKeyboard();
-    if (ch != 's' && ch != 'S') {
+    if (ch != 's' && ch != 'S')
+    {
         printf("Exclusão cancelada.\n");
         printf("Pressione Enter para continuar...\n");
         cleanerKeyboard();
@@ -169,7 +191,8 @@ void deleteCandidate()
 }
 void showCandidatesByUFAndYear()
 {
-    if (candidatesCount == 0) {
+    if (candidatesCount == 0)
+    {
         printf("Nenhum candidato cadastrado.\n");
         return;
     }
@@ -189,11 +212,13 @@ void showCandidatesByUFAndYear()
     printf("| %-4s | %-3s | %-11s | %-2s |\n", "Ano", "UF", "CPF", "Num");
     printShowCandidateBorder();
 
-    for (int i = 0; i < candidatesCount; i++) {
+    for (int i = 0; i < candidatesCount; i++)
+    {
         if (!candidates[i].deleted &&
             candidates[i].year == year &&
-            candidates[i].ufCode == uf) {
-            printf("| %-4d | %-3d | %-11s | %-2s |\n",
+            candidates[i].ufCode == uf)
+        {
+            printf("| %-4d | %-3d | %-11s | %-2d |\n",
                    candidates[i].year,
                    candidates[i].ufCode,
                    candidates[i].cpf,
@@ -206,7 +231,8 @@ void showCandidatesByUFAndYear()
 }
 void showCandidatesByYear()
 {
-    if (candidatesCount == 0) {
+    if (candidatesCount == 0)
+    {
         printf("Nenhum candidato cadastrado.\n");
         return;
     }
@@ -219,21 +245,26 @@ void showCandidatesByYear()
     // Collect matching indices
     int *idxs = malloc(candidatesCount * sizeof(int));
     int cnt = 0;
-    for (int i = 0; i < candidatesCount; i++) {
+    for (int i = 0; i < candidatesCount; i++)
+    {
         if (!candidates[i].deleted && candidates[i].year == year)
             idxs[cnt++] = i;
     }
 
-    if (cnt == 0) {
+    if (cnt == 0)
+    {
         printf("Nenhum candidato encontrado para o ano %d.\n", year);
         free(idxs);
         return;
     }
 
     // Sort by UF code
-    for (int i = 0; i < cnt - 1; i++) {
-        for (int j = i + 1; j < cnt; j++) {
-            if (candidates[idxs[i]].ufCode > candidates[idxs[j]].ufCode) {
+    for (int i = 0; i < cnt - 1; i++)
+    {
+        for (int j = i + 1; j < cnt; j++)
+        {
+            if (candidates[idxs[i]].ufCode > candidates[idxs[j]].ufCode)
+            {
                 int tmpi = idxs[i];
                 idxs[i] = idxs[j];
                 idxs[j] = tmpi;
@@ -246,9 +277,10 @@ void showCandidatesByYear()
     printf("| %-4s | %-2s | %-11s | %-2s |\n", "Ano", "UF", "CPF", "Num");
     printShowCandidateBorder();
 
-    for (int k = 0; k < cnt; k++) {
+    for (int k = 0; k < cnt; k++)
+    {
         int i = idxs[k];
-        printf("| %-4d | %-3d | %-11s | %-2s |\n",
+        printf("| %-4d | %-3d | %-11s | %-2d |\n",
                candidates[i].year,
                candidates[i].ufCode,
                candidates[i].cpf,
@@ -263,10 +295,12 @@ void showCandidatesByYear()
 // Utils
 void pushCandidate(const candidate *p)
 {
-    if (candidatesCount >= candidatesCapacity) {
+    if (candidatesCount >= candidatesCapacity)
+    {
         candidatesCapacity = (candidatesCapacity == 0 ? 10 : candidatesCapacity + 10);
         candidate *tmp = realloc(candidates, candidatesCapacity * sizeof(candidate));
-        if (!tmp) {
+        if (!tmp)
+        {
             printf("Erro ao alocar memoria para candidatos\n");
             exit(-1);
         }
@@ -277,7 +311,8 @@ void pushCandidate(const candidate *p)
 
 int searchCandidateByPK(int year, int ufCode, const char *cpf)
 {
-    for (int i = 0; i < candidatesCount; i++) {
+    for (int i = 0; i < candidatesCount; i++)
+    {
         if (!candidates[i].deleted &&
             candidates[i].year == year &&
             candidates[i].ufCode == ufCode &&
@@ -286,16 +321,31 @@ int searchCandidateByPK(int year, int ufCode, const char *cpf)
     }
     return -1;
 }
-
+int searchCandidateBySK(int ufCode, int year, int number)
+{
+    for (int i = 0; i < candidatesCount; i++)
+    {
+        if (!candidates[i].deleted &&
+            candidates[i].year == year &&
+            candidates[i].ufCode == ufCode &&
+            candidates[i].number == number)
+            return i;
+    }
+    return -1;
+}
 
 void readYear(candidate *tmp, const char *prompt)
 {
     printf("%s", prompt);
-    while (1) {
-        if (scanf("%d", &tmp->year) != 1 || tmp->year <= 0) {
+    while (1)
+    {
+        if (scanf("%d", &tmp->year) != 1 || tmp->year <= 0)
+        {
             cleanerKeyboard();
             printf("Ano invalido. Tente novamente: ");
-        } else {
+        }
+        else
+        {
             cleanerKeyboard();
             break;
         }
@@ -304,12 +354,15 @@ void readYear(candidate *tmp, const char *prompt)
 void readUFCode(candidate *tmp, const char *prompt)
 {
     printf("%s", prompt);
-    while (1) {
-        if (scanf("%d", &tmp->ufCode) != 1 || tmp->ufCode < 1) {
+    while (1)
+    {
+        if (scanf("%d", &tmp->ufCode) != 1 || tmp->ufCode < 1)
+        {
             cleanerKeyboard();
             printf("Codigo de UF invalido. Tente novamente: ");
         }
-        else {
+        else
+        {
             cleanerKeyboard();
             break;
         }
@@ -319,7 +372,8 @@ void readUFCode(candidate *tmp, const char *prompt)
 void readCPFCandidate(candidate *tmp, const char *prompt)
 {
     printf("%s", prompt);
-    while (1) {
+    while (1)
+    {
         scanf("%11s", tmp->cpf);
         cleanerKeyboard();
         if (strlen(tmp->cpf) == 11 &&
@@ -336,13 +390,18 @@ void readCPFCandidate(candidate *tmp, const char *prompt)
 void readNumber(candidate *tmp, const char *prompt)
 {
     printf("%s", prompt);
-    while (1) {
-        scanf("%2s", tmp->number);
-        cleanerKeyboard();
-        if (strlen(tmp->number) == 2 &&
-            isdigit(tmp->number[0]) && isdigit(tmp->number[1]))
+    while (1)
+    {
+        if (scanf("%2d", &tmp->number) != 1 || tmp->number < 0 || tmp->number > 99)
+        {
+            cleanerKeyboard();
+            printf("Numero invalido. Tente novamente: ");
+        }
+        else
+        {
+            cleanerKeyboard();
             break;
-        printf("Numero invalido. Tente novamente: ");
+        }
     }
 }
 void printShowCandidateBorder()

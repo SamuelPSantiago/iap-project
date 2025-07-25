@@ -9,8 +9,11 @@
 #include "ELECTION.h"
 #include "CITIZEN.h"
 #include "CANDIDATE.h"
+#include "VOTE.h"
+#include "ATTENDANCE.h"
 
-int main() {
+int main()
+{
     menu();
 
     loadUFs();
@@ -19,35 +22,42 @@ int main() {
     loadCandidates();
 
     int op;
-    do {
+    do
+    {
         scanf("%d", &op);
         cleanerKeyboard();
 
-        switch (op) {
-            case 1:
-                printf("\n");
-                stateMachineUF();
-                menu();
-                break;
-            case 2:
-                printf("\n");
-                stateMachineElection();
-                menu();
-                break;
-            case 3:
-                printf("\n");
-                stateMachineCitizen();
-                menu();
-                break;
-            case 4:
-                printf("\n");
-                stateMachineCandidate();
-                menu();
-                break;
-            case 0:
-                break;
-            default:
-                printf("Opcao invalida\n");
+        switch (op)
+        {
+        case 1:
+            printf("\n");
+            stateMachineUF();
+            menu();
+            break;
+        case 2:
+            printf("\n");
+            stateMachineElection();
+            menu();
+            break;
+        case 3:
+            printf("\n");
+            stateMachineCitizen();
+            menu();
+            break;
+        case 4:
+            printf("\n");
+            stateMachineCandidate();
+            menu();
+            break;
+        case 5:
+            printf("\n");
+            stateMachineVote();
+            menu();
+            break;
+        case 0:
+            break;
+        default:
+            printf("Opcao invalida. Tente novamente:");
         }
     } while (op != 0);
 }
@@ -84,17 +94,22 @@ void cleanerKeyboard()
     while (getchar() != '\n')
         ;
 }
-void formatBigString(const char *str, size_t width, char *outBuf, size_t outBufSize) {
+void formatBigString(const char *str, size_t width, char *outBuf, size_t outBufSize)
+{
     size_t len = strlen(str);
     if (len > width && width > 3)
         snprintf(outBuf, outBufSize, "%.*s...", (int)(width - 3), str);
-    else if (len > width) {
+    else if (len > width)
+    {
         size_t dots = width < outBufSize - 1 ? width : outBufSize - 1;
         memset(outBuf, '.', dots);
         outBuf[dots] = '\0';
-    } else snprintf(outBuf, outBufSize, "%s", str);
+    }
+    else
+        snprintf(outBuf, outBufSize, "%s", str);
 }
-void freeMemory() {
+void freeMemory()
+{
     freeUFs();
     freeElections();
     freeCitizens();

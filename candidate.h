@@ -9,7 +9,7 @@ typedef struct {
     int year; // Election year
     int ufCode; // UF code (integer, PK references UF)
     char cpf[12]; // Citizen CPF (11 digits + '\0')
-    char number[3]; // Candidate number (2 digits + '\0')
+    int number; // Candidate number (2 digits)
 
     int deleted;
 } candidate;
@@ -33,6 +33,7 @@ void showCandidatesByYear(); // Display candidates by year ordered by UF
 // Utils
 void pushCandidate(const candidate *p); // Add a candidate to the in‑memory array
 int  searchCandidateByPK(int year, int ufCode, const char *cpf); // Return index or -1
+int  searchCandidateBySK(int ufCode, int year, int number); // Search by UF code, year, and number
 
 void readYear(candidate *tmp, const char *prompt); // Read and validate year
 void readUFCode(candidate *tmp, const char *prompt); // Read and validate UF code

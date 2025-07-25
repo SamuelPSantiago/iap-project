@@ -60,7 +60,7 @@ void stateMachineElection()
             saveElections();
             break;
         default:
-            printf("Opcao invalida.\n");
+            printf("Opcao invalida. Tente novamente:");
         }
     } while (option != 0);
 }
@@ -75,7 +75,7 @@ void loadElections()
     {
         if (errno != ENOENT)
             printf("Erro ao abrir arquivo de eleicoes: %s\n", strerror(errno)); // Print error if not file not found
-            
+
         return;
     }
 
@@ -282,7 +282,7 @@ void pushElection(const election *item)
     {
         electionsCapacity = (electionsCapacity == 0 ? 10 : electionsCapacity * 2);
         election *tmp = realloc(elections, electionsCapacity * sizeof(election));
-        
+
         if (!tmp)
         {
             printf("Erro ao alocar memoria para eleicoes\n");
@@ -311,8 +311,10 @@ void readElectionYear(int *year, const char *prompt)
 
         // Remove newline
         len = strcspn(buf, "\n");
-        if (buf[len] != '\n') cleanerKeyboard();
-        else buf[len] = '\0';
+        if (buf[len] != '\n')
+            cleanerKeyboard();
+        else
+            buf[len] = '\0';
 
         // Check if length is exactly 4
         if (len != 4)
@@ -323,7 +325,8 @@ void readElectionYear(int *year, const char *prompt)
         }
 
         // Check if all characters are digits
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 4; i++)
+        {
             if (!isdigit((unsigned char)buf[i]))
             {
                 printf("Ano deve ser numerico!\n");
@@ -372,7 +375,23 @@ int findElectionIndex(int year, int ufCode)
     for (int i = 0; i < electionsCount; i++)
         if (elections[i].year == year && elections[i].ufCode == ufCode && !elections[i].deleted)
             return i;
-            
+
+    return -1;
+}
+int searchElectionByYear(int year)
+{
+    for (int i = 0; i < electionsCount; i++)
+        if (elections[i].year == year && !elections[i].deleted)
+            return i;
+
+    return -1;
+}
+int searchElectionByUfCode(int ufCode)
+{
+    for (int i = 0; i < electionsCount; i++)
+        if (elections[i].ufCode == ufCode && !elections[i].deleted)
+            return i;
+
     return -1;
 }
 

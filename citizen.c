@@ -61,8 +61,7 @@ void stateMachineCitizen()
             saveCitizens();
             break;
         default:
-            printf("Escolha uma opção válida.\n");
-            break;
+            printf("Opcao invalida. Tente novamente:");
         }
     } while (op != 0);
 }
@@ -77,17 +76,18 @@ void loadCitizens()
     {
         if (errno != ENOENT)
             printf("Erro ao abrir arquivo de pessoas: %s\n", strerror(errno)); // Print error if not file not found
-         
+
         return;
     }
 
     free(citizens);
     citizens = NULL;
     citizensCount = citizensCapacity = 0;
-    
+
     citizen tmp;
     while (fread(&tmp, sizeof(citizen), 1, f) == 1)
-        if (!tmp.deleted) pushCitizen(&tmp);
+        if (!tmp.deleted)
+            pushCitizen(&tmp);
 
     fclose(f);
     citizensModified = 0;
@@ -199,22 +199,22 @@ void updateCitizen()
 
         switch (op)
         {
-            case 1:
-                readName(&tmp, "Digite o novo nome completo: *");
-                break;
-            case 2:
-                readPhone(&tmp, "Digite o novo telefone (com DDD): ");
-                break;
-            case 3:
-                readAddress(&tmp, "Digite o novo endereco: ");
-                break;
-            case 4:
-                readBirthdate(&tmp, "Digite a nova data de nascimento (DD-MM-YYYY): *");
-                break;
-            case 0:
-                break;
-            default:
-                printf("Opcao invalida. Tente novamente.\n");
+        case 1:
+            readName(&tmp, "Digite o novo nome completo: *");
+            break;
+        case 2:
+            readPhone(&tmp, "Digite o novo telefone (com DDD): ");
+            break;
+        case 3:
+            readAddress(&tmp, "Digite o novo endereco: ");
+            break;
+        case 4:
+            readBirthdate(&tmp, "Digite a nova data de nascimento (DD-MM-YYYY): *");
+            break;
+        case 0:
+            break;
+        default:
+            printf("Opcao invalida. Tente novamente.\n");
         }
     } while (op != 0);
 
@@ -267,7 +267,7 @@ void deleteCitizen()
     }
 
     printf("Pessoa com CPF %s nao encontrado ou ja deletado.\n", cpf);
-    
+
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
@@ -309,8 +309,8 @@ void showCitizenByCPF()
     {
         if (!strcmp(citizens[i].cpf, cpf) == 0)
             continue;
-        
-        if(!citizens[i].deleted)
+
+        if (!citizens[i].deleted)
         {
             printShowCitizenHeader("Dados da pessoa:");
             printShowCitizenUI(&citizens[i]);
@@ -319,7 +319,8 @@ void showCitizenByCPF()
             printf("Pressione Enter para continuar...\n");
             cleanerKeyboard();
         }
-        else printf("Pessoa com CPF %s nao encontrada.\n", cpf);
+        else
+            printf("Pessoa com CPF %s nao encontrada.\n", cpf);
 
         found = 1;
         break;
@@ -354,7 +355,7 @@ void showCitizenByVoterNumber()
         printShowCitizenHeader("Dados da pessoa:");
         printShowCitizenUI(&citizens[idx]);
         printShowCitizenBorder();
-    } 
+    }
     else
     {
         printf("Pessoa com titulo %s nao encontrada.\n", title);
@@ -485,31 +486,41 @@ void readBirthdate(citizen *tmp, const char *prompt)
             // Parse day, month, year
             int day = (tmp->birthdate[0] - '0') * 10 + (tmp->birthdate[1] - '0');
             int month = (tmp->birthdate[3] - '0') * 10 + (tmp->birthdate[4] - '0');
-            int year = (tmp->birthdate[6] - '0') * 1000
-                     + (tmp->birthdate[7] - '0') * 100
-                     + (tmp->birthdate[8] - '0') * 10
-                     + (tmp->birthdate[9] - '0');
+            int year = (tmp->birthdate[6] - '0') * 1000 + (tmp->birthdate[7] - '0') * 100 + (tmp->birthdate[8] - '0') * 10 + (tmp->birthdate[9] - '0');
 
             // Determine days in month, accounting for leap year
             int max_day = 0;
-            if (month >= 1 && month <= 12) {
-                switch (month) {
-                    case  1: case  3: case  5: case  7:
-                    case  8: case 10: case 12:
-                        max_day = 31; break;
-                    case  4: case  6: case  9: case 11:
-                        max_day = 30; break;
-                    case  2:
-                        if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
-                            max_day = 29;
-                        else
-                            max_day = 28;
-                        break;
+            if (month >= 1 && month <= 12)
+            {
+                switch (month)
+                {
+                case 1:
+                case 3:
+                case 5:
+                case 7:
+                case 8:
+                case 10:
+                case 12:
+                    max_day = 31;
+                    break;
+                case 4:
+                case 6:
+                case 9:
+                case 11:
+                    max_day = 30;
+                    break;
+                case 2:
+                    if ((year % 4 == 0 && year % 100 != 0) || (year % 400 == 0))
+                        max_day = 29;
+                    else
+                        max_day = 28;
+                    break;
                 }
             }
 
             // Final validity check: month 1-12 and day within range
-            if (month >= 1 && month <= 12 && day >= 1 && day <= max_day) break;
+            if (month >= 1 && month <= 12 && day >= 1 && day <= max_day)
+                break;
         }
 
         printf("Data de nascimento invalida. Tente novamente: ");
@@ -556,7 +567,7 @@ void printShowCitizenUI(const citizen *p)
     char address[31];
     formatBigString(p->address, 30, address, sizeof(address));
 
-    printf("| %-11s | %-13s | %-30s | %-11s | %-30s | %-11s |\n", 
+    printf("| %-11s | %-13s | %-30s | %-11s | %-30s | %-11s |\n",
            p->cpf,
            p->voterNumber,
            name,
