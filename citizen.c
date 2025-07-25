@@ -576,6 +576,13 @@ void printShowCitizenUI(const citizen *p)
            p->birthdate);
 }
 
+citizen *getSpecificCitizen(int idx)
+{
+    if (idx < 0 || idx >= citizensCount) return NULL;
+    if (citizens[idx].deleted) return NULL;
+    return &citizens[idx];
+}
+
 void freeCitizens()
 {
     free(citizens);

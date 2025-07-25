@@ -49,6 +49,8 @@ void printShowCitizenHeader(const char *header); // Print the header for showing
 void printShowCitizenBorder(); // Print the border for showing citizens
 void printShowCitizenUI(const citizen *p); // Print the UI for showing a citizen
 
+citizen *getSpecificCitizen(int idx); // Get a specific citizen by index
+
 void freeCitizens(); // Free the memory allocated for citizens
 
 #endif

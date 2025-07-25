@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/time.h>
 
 #include "MAIN.h"
 #include "UF.h"
@@ -99,13 +100,12 @@ void saveVotes()
     votesModified = 0;
 }
 
-void createVote()
-{
+void createVote() {
     vote tmp;
     memset(&tmp, 0, sizeof(tmp));
+
     readYearVote(&tmp, "Digite o ano da eleicao: *");
-    if (searchElectionByYear(tmp.year) < 0)
-    {
+    if (searchElectionByYear(tmp.year) < 0) {
         printf("\nNao existe nenhuma eleicao nesse ano!\n");
         printf("Pressione Enter para continuar...\n");
         cleanerKeyboard();
@@ -113,26 +113,56 @@ void createVote()
     }
 
     readUFCodeVote(&tmp, "Digite o codigo da UF: *");
-    if (findElectionIndex(tmp.year, tmp.ufCode) < 0)
-    {
+    if (findElectionIndex(tmp.year, tmp.ufCode) < 0) {
         printf("\nNo ano selecionado, essa UF nao possui eleicao cadastrada!\n");
         printf("Pressione Enter para continuar...\n");
         cleanerKeyboard();
         return;
     }
 
-    readCandidateNumber(&tmp, "Digite o numero do candidato: *");
-    if (searchCandidateBySK(tmp.year, tmp.ufCode, tmp.candidateNumber) < 0)
-    {
-        printf("\nCandidato nao encontrado na eleicao.\n");
-        printf("Pressione Enter para continuar...\n");
-        cleanerKeyboard();
-        return;
+    printf("\n");
+
+    int confirmed = 0;
+    while (!confirmed) {
+        readCandidateNumber(&tmp, "Digite o numero do candidato: *");
+
+        int candidateIndex = searchCandidateBySK(tmp.ufCode, tmp.year, tmp.candidateNumber);
+        if (candidateIndex < 0)
+            tmp.candidateNumber = 0;
+
+        int ch;
+        if (tmp.candidateNumber == 0) { // Null vote
+            do {
+                printf("Confirma voto NULO? (S/N): ");
+                ch = getchar();
+                cleanerKeyboard();
+
+                if (ch == 's' || ch == 'S') confirmed = 1;
+                else if (ch == 'n' || ch == 'N') {
+                    printf("Voto cancelado.\n\n");
+                    break;
+                } else printf("Opcao invalida. Tente novamente.\n");
+            } while (1);
+
+        } else {
+            do {
+                printf("Confirma voto para candidato %d? (S/N): ", tmp.candidateNumber);
+                ch = getchar();
+                cleanerKeyboard();
+
+                if (ch == 's' || ch == 'S') confirmed = 1;
+                else if (ch == 'n' || ch == 'N') {
+                    printf("Voto cancelado.\n\n");
+                    break;
+                } else printf("Opcao invalida. Tente novamente.\n");
+            } while (1);
+        }
     }
 
-    readDateTime(&tmp, "Digite data e hora (DD-MM-YYYY HH:MM): *");
+    setCurrentDateTime(&tmp);
     pushVote(&tmp);
     votesModified = 1;
+
     printf("Voto registrado com sucesso!\n");
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
@@ -156,31 +186,23 @@ void showVotesByCandidateAndYear()
     scanf("%d", &uf);
     cleanerKeyboard();
 
+    printf("\n");
+
     printf("Digite numero do candidato: ");
     scanf("%2d", &num);
     cleanerKeyboard();
-
-    printf("\nVotos do candidato %d no ano %d UF %d:\n",
-        num,
-        year,
-        uf);
     
-    printShowCandidateBorder();
-    printf("| %-4s | %-3s | %-2s | %-16s |\n", "Ano", "UF", "Num", "DataHora");
-    printShowCandidateBorder();
+    printf("\n");
+
+    char title[100];
+    sprintf(title, "Votos do candidato %d no ano %d UF %d", num, year, uf);
+    printShowVoteHeader(title);
 
     for (int i = 0; i < votesCount; i++)
-    {
-        if (votes[i].year == year && votes[i].ufCode == uf && votes[i].candidateNumber != num)
-        {
-            printf("| %-4d | %-3d | %-2d | %-16s |\n",
-                   votes[i].year,
-                   votes[i].ufCode,
-                   votes[i].candidateNumber,
-                   votes[i].dateTime);
-        }
-    }
-    printShowCandidateBorder();
+        if (votes[i].year == year && votes[i].ufCode == uf && votes[i].candidateNumber == num)
+        printShowVoteUI(&votes[i]);
+    
+    printShowVoteBorder();
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
@@ -270,16 +292,35 @@ void readUFCodeVote(vote *tmp, const char *prompt)
 void readCandidateNumber(vote *tmp, const char *prompt)
 {
     printf("%s", prompt);
-    while (scanf("%2d", &tmp->candidateNumber) != 1 || tmp->candidateNumber < 1 || tmp->candidateNumber > 99)
+    while (scanf("%2d", &tmp->candidateNumber) != 1 || tmp->candidateNumber < 0 || tmp->candidateNumber > 99)
     {
         cleanerKeyboard();
         printf("Numero invalido. Tente novamente: ");
     }
     cleanerKeyboard();
 }
-void readDateTime(vote *tmp, const char *prompt)
+
+void printShowVoteHeader(const char *title)
 {
-    printf("%s", prompt);
-    fgets(tmp->dateTime, sizeof(tmp->dateTime), stdin);
-    tmp->dateTime[strcspn(tmp->dateTime, "\n")] = '\0';
+    printf("+--------------------------------------------+\n");
+    printf("| %-42s |\n", title);
+    printShowCandidateBorder();
+    printf("| %-4s | %-2s | %-11s | %-16s |\n", "Ano", "UF", "Num", "DataHora");
+    printShowCandidateBorder();
+}
+void printShowVoteBorder()
+{
+    printf("+------+----+-------------+------------------+\n");
+}
+void printShowVoteUI(const vote *v)
+{
+    printf("| %-4d | %-2d | %-11d | %-16s |\n",
+           v->year, v->ufCode, v->candidateNumber, v->dateTime);
+}
+
+void setCurrentDateTime(vote *tmp) {
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    struct tm *t = localtime((time_t *)&tv.tv_sec);
+    strftime(tmp->dateTime, sizeof(tmp->dateTime), "%d-%m-%Y %H:%M:%S", t);
 }

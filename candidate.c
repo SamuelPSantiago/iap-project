@@ -207,10 +207,9 @@ void showCandidatesByUFAndYear()
     scanf("%d", &uf);
     cleanerKeyboard();
 
-    printf("\nCandidatos do ano %d na UF %d:\n", year, uf);
-    printShowCandidateBorder();
-    printf("| %-4s | %-3s | %-11s | %-2s |\n", "Ano", "UF", "CPF", "Num");
-    printShowCandidateBorder();
+    printf("\n");
+
+    printShowCandidateHeader("Candidatos por UF e Ano");
 
     for (int i = 0; i < candidatesCount; i++)
     {
@@ -218,13 +217,10 @@ void showCandidatesByUFAndYear()
             candidates[i].year == year &&
             candidates[i].ufCode == uf)
         {
-            printf("| %-4d | %-3d | %-11s | %-2d |\n",
-                   candidates[i].year,
-                   candidates[i].ufCode,
-                   candidates[i].cpf,
-                   candidates[i].number);
+            printShowCandidateUI(&candidates[i]);
         }
     }
+
     printShowCandidateBorder();
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
@@ -272,23 +268,18 @@ void showCandidatesByYear()
         }
     }
 
-    printf("\nCandidatos do ano %d:\n", year);
-    printShowCandidateBorder();
-    printf("| %-4s | %-2s | %-11s | %-2s |\n", "Ano", "UF", "CPF", "Num");
-    printShowCandidateBorder();
+    printShowCandidateHeader("Candidatos por ano");
 
     for (int k = 0; k < cnt; k++)
     {
         int i = idxs[k];
-        printf("| %-4d | %-3d | %-11s | %-2d |\n",
-               candidates[i].year,
-               candidates[i].ufCode,
-               candidates[i].cpf,
-               candidates[i].number);
+        printShowCandidateUI(&candidates[i]);
     }
+
     printShowCandidateBorder();
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
+    
     free(idxs);
 }
 
@@ -321,7 +312,7 @@ int searchCandidateByPK(int year, int ufCode, const char *cpf)
     }
     return -1;
 }
-int searchCandidateBySK(int ufCode, int year, int number)
+int searchCandidateBySK(int year, int ufCode, int number)
 {
     for (int i = 0; i < candidatesCount; i++)
     {
@@ -404,9 +395,36 @@ void readNumber(candidate *tmp, const char *prompt)
         }
     }
 }
+
+void printShowCandidateHeader(const char *title)
+{
+    printf("+---------------------------------------------------------------+\n");
+    printf("| %-61s |\n", title);
+    printShowCandidateBorder();
+}
 void printShowCandidateBorder()
 {
-    printf("+------+----+-------------+----+\n");
+    printf("+------+----+-------------+--------------------------------+----+\n");
+}
+void printShowCandidateUI(const candidate *item)
+{
+    int idx = searchCitizenByCPF(item->cpf);
+    citizen *c = getSpecificCitizen(idx);
+    if (!c) return;
+
+    char name[31];
+    strncpy(name, c->name, sizeof(name) - 1);
+    name[sizeof(name) - 1] = '\0';
+
+    char nameFormatted[31];
+    formatBigString(name, 30, nameFormatted, sizeof(nameFormatted));
+
+    printf("| %-4d | %-2d | %-11s | %-30s | %-2d |\n",
+           item->year,
+           item->ufCode,
+           item->cpf,
+           nameFormatted,
+           item->number);
 }
 
 void freeCandidates()

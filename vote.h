@@ -31,6 +31,11 @@ void pushVote(const vote *v);     // Add vote to in-memory array
 void readYearVote(vote *tmp, const char *prompt); // Read election year
 void readUFCodeVote(vote *tmp, const char *prompt); // Read UF code
 void readCandidateNumber(vote *tmp, const char *prompt); // Read candidate number
-void readDateTime(vote *tmp, const char *prompt); // Read date and time of vote
+
+void printShowVoteHeader(const char *header); // Print header for showing votes
+void printShowVoteBorder(); // Print table border for showing votes
+void printShowVoteUI(const vote *v); // Print a single vote record
+
+void setCurrentDateTime(vote *tmp); // Set current date and time in vote
 
 #endif

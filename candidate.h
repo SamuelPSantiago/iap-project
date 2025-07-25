@@ -40,7 +40,10 @@ void readUFCode(candidate *tmp, const char *prompt); // Read and validate UF cod
 void readCPFCandidate(candidate *tmp, const char *prompt); // Read and validate CPF
 void readNumber(candidate *tmp, const char *prompt); // Read and validate candidate number
 
+void printShowCandidateHeader(const char *title); // Print header for candidate records
 void printShowCandidateBorder(); // Print table border
+void printShowCandidateUI(const candidate *item); // Print a single candidate record
+
 void freeCandidates(); // Free allocated memory
 
 #endif

@@ -240,21 +240,30 @@ void listElections()
         printf("Nenhuma eleicao cadastrada.\n");
         return;
     }
-    printElectionHeader("Lista de Eleicoes:");
+
+    printElectionHeader("Lista de eleicoes:");
     for (int i = 0; i < electionsCount; i++)
         if (!elections[i].deleted)
             printElectionRow(&elections[i]);
     printElectionBorder();
+
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
 }
 void viewElection()
 {
     int year, ufCode;
+
     printf("Digite o ano da eleicao: ");
     scanf("%d", &year);
     cleanerKeyboard();
+
     printf("Digite o codigo da UF: ");
     scanf("%d", &ufCode);
     cleanerKeyboard();
+
+    printf("\n");
+
     for (int i = 0; i < electionsCount; i++)
     {
         if (elections[i].year == year && elections[i].ufCode == ufCode)
@@ -265,14 +274,18 @@ void viewElection()
                 printElectionRow(&elections[i]);
                 printElectionBorder();
             }
-            else
-            {
-                printf("Eleicao nao encontrada.\n");
-            }
+            else printf("Eleicao nao encontrada.\n");
+
+            printf("Pressione Enter para continuar...\n");
+            cleanerKeyboard();
+            
             return;
         }
     }
     printf("Eleicao nao encontrada.\n");
+
+    printf("Pressione Enter para continuar...\n");
+    cleanerKeyboard();
 }
 
 // Utils
@@ -397,22 +410,25 @@ int searchElectionByUfCode(int ufCode)
 
 void printElectionHeader(const char *title)
 {
-    printf("+--------------------------------------------------+\n");
-    printf("| %-48s |\n", title);
+    printf("+------------------------------------------------------+\n");
+    printf("| %-52s |\n", title);
     printElectionBorder();
-    printf("| %-4s | %-6s | %-32s |\n", "Ano", "UF", "Descricao");
+    printf("| %-4s | %-2s | %-40s |\n",
+        "Ano",
+        "UF",
+        "Descricao");
     printElectionBorder();
 }
 void printElectionBorder()
 {
-    printf("+------+--------+--------------------------------+\n");
+    printf("+------+----+------------------------------------------+\n");
 }
 void printElectionRow(const election *item)
 {
     char desc[31];
     formatBigString(item->description, 30, desc, sizeof(desc));
 
-    printf("| %4d | %6d | %-30s |\n",
+    printf("| %4d | %2d | %-40s |\n",
            item->year,
            item->ufCode,
            desc);
