@@ -279,7 +279,7 @@ void showCandidatesByYear()
     printShowCandidateBorder();
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
-    
+
     free(idxs);
 }
 
@@ -398,13 +398,15 @@ void readNumber(candidate *tmp, const char *prompt)
 
 void printShowCandidateHeader(const char *title)
 {
-    printf("+---------------------------------------------------------------+\n");
-    printf("| %-61s |\n", title);
+    printf("+----------------------------------------------------------------+\n");
+    printf("| %-62s |\n", title);
+    printShowCandidateBorder();
+    printf("| %-4s | %-2s | %-11s | %-30s | %-3s |\n", "Ano", "UF", "CPF", "Nome", "Num");
     printShowCandidateBorder();
 }
 void printShowCandidateBorder()
 {
-    printf("+------+----+-------------+--------------------------------+----+\n");
+    printf("+------+----+-------------+--------------------------------+-----+\n");
 }
 void printShowCandidateUI(const candidate *item)
 {
@@ -419,7 +421,7 @@ void printShowCandidateUI(const candidate *item)
     char nameFormatted[31];
     formatBigString(name, 30, nameFormatted, sizeof(nameFormatted));
 
-    printf("| %-4d | %-2d | %-11s | %-30s | %-2d |\n",
+    printf("| %-4d | %-2d | %-11s | %-30s | %-3d |\n",
            item->year,
            item->ufCode,
            item->cpf,
