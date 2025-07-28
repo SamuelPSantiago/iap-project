@@ -60,7 +60,7 @@ void stateMachineElection()
             saveElections();
             break;
         default:
-            printf("Opcao invalida. Tente novamente:");
+            printf("Opcao invalida.\n\n");
         }
     } while (option != 0);
 }
@@ -116,14 +116,16 @@ void createElection()
     election e;
     memset(&e, 0, sizeof(e));
     readElectionYear(&e.year, "Digite o ano da eleicao (4 digitos): ");
+
     readElectionUfCode(&e.ufCode, "Digite o codigo da UF (existente): ");
     if (findElectionIndex(e.year, e.ufCode) != -1)
     {
-        printf("Eleicao para %d / UF %d ja existe.\n", e.year, e.ufCode);
+        printf("\nEleicao para %d / UF %d ja existe.\n", e.year, e.ufCode);
         printf("Pressione Enter para continuar...\n");
         cleanerKeyboard();
         return;
     }
+
     readElectionDescription(&e, "Digite a descricao: ");
     e.deleted = 0;
     pushElection(&e);
@@ -370,7 +372,7 @@ void readElectionUfCode(int *ufCode, const char *prompt)
 
         if (searchUF(code) < 0)
         {
-            printf("Codigo de UF nao cadastrado!\n");
+            printf("Codigo de UF nao cadastrado!\n\n");
             invalid = 1;
         }
     } while (invalid);

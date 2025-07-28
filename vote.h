@@ -9,7 +9,7 @@ typedef struct {
     int year; // Election year (must exist in election records)
     int ufCode; // UF code (must exist in UF records)
     int candidateNumber; // Candidate number (must exist in candidate records)
-    char dateTime[17]; // Date and time "DD-MM-YYYY HH:MM"
+    char dateTime[20]; // Date and time "DD-MM-YYYY HH:MM:SS"
 } vote;
 
 // Menu controllers
@@ -28,6 +28,7 @@ void showVotesByYear(); // Show all votes by year ordered by UF
 // Utils
 void pushVote(const vote *v); // Add vote to in-memory array
 
+void readCPFVote(char *out, const char *prompt); // Read CPF for voting
 void readYearVote(vote *tmp, const char *prompt); // Read election year
 void readUFCodeVote(vote *tmp, const char *prompt); // Read UF code
 void readCandidateNumber(vote *tmp, const char *prompt); // Read candidate number
@@ -37,5 +38,8 @@ void printShowVoteBorder(); // Print table border for showing votes
 void printShowVoteUI(const vote *v); // Print a single vote record
 
 void setCurrentDateTime(vote *tmp); // Set current date and time in vote
+
+const vote *getVotes(); // Get pointer to votes array
+int getVotesCount();  // Get count of votes
 
 #endif

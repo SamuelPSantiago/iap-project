@@ -11,6 +11,7 @@
 #include "CANDIDATE.h"
 #include "VOTE.h"
 #include "ATTENDANCE.h"
+#include "RESULT.h"
 
 int main()
 {
@@ -20,6 +21,8 @@ int main()
     loadElections();
     loadCitizens();
     loadCandidates();
+    loadVotes();
+    loadAttendances();
 
     int op;
     do
@@ -52,6 +55,11 @@ int main()
         case 5:
             printf("\n");
             stateMachineVote();
+            menu();
+            break;
+        case 6:
+            printf("\n");
+            stateMachineResult();
             menu();
             break;
         case 0:

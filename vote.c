@@ -3,13 +3,14 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <errno.h>
-#include <sys/time.h>
+#include <time.h>
 
 #include "MAIN.h"
 #include "UF.h"
 #include "ELECTION.h"
 #include "CANDIDATE.h"
 #include "VOTE.h"
+#include "ATTENDANCE.h"
 
 static vote *votes = NULL;
 static int votesCount = 0;
@@ -55,9 +56,10 @@ void stateMachineVote()
             break;
         case 0:
             saveVotes();
+            saveAttendances();
             break;
         default:
-            printf("Opcao invalida. Tente novamente:");
+            printf("Opcao invalida.\n\n");
         }
     } while (op != 0);
 }
@@ -88,8 +90,8 @@ void loadVotes()
 }
 void saveVotes()
 {
-    if (!votesModified)
-        return;
+    if (!votesModified) return;
+
     ensureDataDir();
     FILE *f = fopen(FILENAMEVOTE, "wb");
     if (!f)
@@ -97,6 +99,7 @@ void saveVotes()
         printf("Erro ao salvar votos em %s\n", FILENAMEVOTE);
         return;
     }
+
     fwrite(votes, sizeof(vote), votesCount, f);
     fclose(f);
     votesModified = 0;
@@ -109,7 +112,7 @@ void createVote()
     memset(&tmp, 0, sizeof(tmp));
 
     char cpf[12];
-    readCPF(cpf, "Digite seu CPF: ");
+    readCPFVote(cpf, "Digite seu CPF: ");
 
     readYearVote(&tmp, "Digite o ano da eleicao: ");
     if (searchElectionByYear(tmp.year) < 0)
@@ -173,6 +176,9 @@ void createVote()
     votesModified = 1;
 
     printf("\nVoto confirmado!\n");
+
+    printf("Data e hora gravada: %s\n", tmp.dateTime);
+
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
@@ -181,6 +187,9 @@ void showVotesByCandidateAndYear()
     if (!votesCount)
     {
         printf("Nenhum voto registrado.\n");
+
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 
@@ -220,12 +229,19 @@ void showVotesByYear()
     if (!votesCount)
     {
         printf("Nenhum voto registrado.\n");
+
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
+
     int year;
     printf("Digite o ano da eleicao: ");
     scanf("%d", &year);
     cleanerKeyboard();
+
+    printf("\n");
+
     // collect and sort by UF
     int *idxs = malloc(votesCount * sizeof(int)), cnt = 0;
     for (int i = 0; i < votesCount; i++)
@@ -237,6 +253,7 @@ void showVotesByYear()
         free(idxs);
         return;
     }
+
     for (int i = 0; i < cnt - 1; i++)
         for (int j = i + 1; j < cnt; j++)
             if (votes[idxs[i]].ufCode > votes[idxs[j]].ufCode)
@@ -245,18 +262,19 @@ void showVotesByYear()
                 idxs[i] = idxs[j];
                 idxs[j] = t;
             }
-    printf("\nVotos no ano %d ordenados por UF:\n", year);
-    printShowCandidateBorder();
-    printf("| %-4s | %-3s | %-2s | %-16s |\n", "Ano", "UF", "Num", "DataHora");
-    printShowCandidateBorder();
+
+    char title[100];
+    sprintf(title, "Votos no ano %d ordenados por UF:", year);
+
+    printShowVoteHeader(title);
+
     for (int k = 0; k < cnt; k++)
     {
         int i = idxs[k];
-        printf("| %-4d | %-3d | %-2d | %-16s |\n",
-               votes[i].year, votes[i].ufCode,
-               votes[i].candidateNumber, votes[i].dateTime);
+        printShowVoteUI(&votes[i]);
     }
-    printShowCandidateBorder();
+
+    printShowVoteBorder();
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
     free(idxs);
@@ -279,6 +297,20 @@ void pushVote(const vote *v)
     votes[votesCount++] = *v;
 }
 
+void readCPFVote(char *out, const char *prompt)
+{
+    char buf[20];
+    int valid;
+    do {
+        printf("%s", prompt);
+        if (!fgets(buf, sizeof(buf), stdin)) continue;
+        buf[strcspn(buf, "\n")] = '\0';
+
+        valid = strlen(buf) == 11 && strspn(buf, "0123456789") == 11;
+        if (!valid) printf("CPF invalido! Digite 11 digitos numericos.\n");
+    } while (!valid);
+    strncpy(out, buf, 12);
+}
 void readYearVote(vote *tmp, const char *prompt)
 {
     printf("%s", prompt);
@@ -312,26 +344,33 @@ void readCandidateNumber(vote *tmp, const char *prompt)
 
 void printShowVoteHeader(const char *title)
 {
-    printf("+--------------------------------------------+\n");
-    printf("| %-42s |\n", title);
-    printShowCandidateBorder();
-    printf("| %-4s | %-2s | %-11s | %-16s |\n", "Ano", "UF", "Num", "DataHora");
-    printShowCandidateBorder();
+    printf("+----------------------------------------+\n");
+    printf("| %-38s |\n", title);
+    printShowVoteBorder();
+    printf("| %-4s | %-3s | %-3s | %-19s |\n", "Ano", "UF", "Num", "DataHora");
+    printShowVoteBorder();
 }
 void printShowVoteBorder()
 {
-    printf("+------+----+-------------+------------------+\n");
+    printf("+------+-----+-----+---------------------+\n");
 }
 void printShowVoteUI(const vote *v)
 {
-    printf("| %-4d | %-2d | %-11d | %-16s |\n",
+    printf("| %-4d | %-3d | %-3d | %-19s |\n",
            v->year, v->ufCode, v->candidateNumber, v->dateTime);
 }
 
 void setCurrentDateTime(vote *tmp)
 {
-    struct timeval tv;
-    gettimeofday(&tv, NULL);
-    struct tm *t = localtime((time_t *)&tv.tv_sec);
+    time_t now = time(NULL);
+    struct tm *t = localtime(&now);
+
     strftime(tmp->dateTime, sizeof(tmp->dateTime), "%d-%m-%Y %H:%M:%S", t);
+}
+
+const vote *getVotes() {
+    return votes;
+}
+int getVotesCount() {
+    return votesCount;
 }

@@ -55,12 +55,15 @@ void pushAttendance(const attendance *a)
     if (attendancesCount >= attendancesCapacity) {
         attendancesCapacity = attendancesCapacity ? attendancesCapacity + 10 : 10;
         attendance *tmp = realloc(attendances, attendancesCapacity * sizeof(attendance));
+        
         if (!tmp) {
             printf("Erro ao alocar comparecimentos\n");
             exit(-1);
         }
+
         attendances = tmp;
     }
+
     attendances[attendancesCount++] = *a;
     attendancesModified = 1;
 }
@@ -79,6 +82,7 @@ void registerAttendance(const char *cpf, int year, int ufCode)
     strncpy(a.cpf, cpf, sizeof(a.cpf));
     a.year = year;
     a.ufCode = ufCode;
+
     pushAttendance(&a);
 }
 void showAttendanceCount()
@@ -98,4 +102,11 @@ void showAttendanceCount()
     printf("Comparecimentos em %d na UF %d: %d\n", year, uf, count);
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
+}
+
+const attendance *getAttendances() {
+    return attendances;
+}
+int getAttendancesCount() {
+    return attendancesCount;
 }

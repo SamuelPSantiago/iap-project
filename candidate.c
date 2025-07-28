@@ -60,7 +60,7 @@ void stateMachineCandidate()
             saveCandidates();
             break;
         default:
-            printf("Opcao invalida. Tente novamente:");
+            printf("Opcao invalida.\n\n");
             break;
         }
     } while (op != 0);
@@ -193,6 +193,8 @@ void showCandidatesByUFAndYear()
     if (candidatesCount == 0)
     {
         printf("Nenhum candidato cadastrado.\n");
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 
@@ -208,19 +210,26 @@ void showCandidatesByUFAndYear()
 
     printf("\n");
 
-    printShowCandidateHeader("Candidatos por UF e Ano");
-
+    int found = 0;
     for (int i = 0; i < candidatesCount; i++)
     {
         if (!candidates[i].deleted &&
             candidates[i].year == year &&
             candidates[i].ufCode == uf)
         {
+            if (!found)
+            {
+                printShowCandidateHeader("Candidatos por UF e Ano");
+                found = 1;
+            }
+
             printShowCandidateUI(&candidates[i]);
         }
     }
 
-    printShowCandidateBorder();
+    if (found) printShowCandidateBorder();
+    else printf("Nenhum candidato encontrado para o ano %d e UF %d.\n", year, uf);
+
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }
@@ -229,6 +238,9 @@ void showCandidatesByYear()
     if (candidatesCount == 0)
     {
         printf("Nenhum candidato cadastrado.\n");
+
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 
@@ -236,6 +248,8 @@ void showCandidatesByYear()
     printf("Digite o ano da eleicao: ");
     scanf("%d", &year);
     cleanerKeyboard();
+
+    printf("\n");
 
     // Collect matching indices
     int *idxs = malloc(candidatesCount * sizeof(int));
@@ -250,6 +264,9 @@ void showCandidatesByYear()
     {
         printf("Nenhum candidato encontrado para o ano %d.\n", year);
         free(idxs);
+
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 

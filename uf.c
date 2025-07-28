@@ -62,8 +62,7 @@ void stateMachineUF()
             saveUFs();
             break;
         default:
-            printf("Opcao invalida. Tente novamente:");
-            break;
+            printf("Opcao invalida.\n\n");
         }
     } while (op != 0);
 }

@@ -61,7 +61,7 @@ void stateMachineCitizen()
             saveCitizens();
             break;
         default:
-            printf("Opcao invalida. Tente novamente:");
+            printf("Opcao invalida.\n\n");
         }
     } while (op != 0);
 }
@@ -123,7 +123,7 @@ void createCitizen()
         return;
     }
 
-    readVoterNumber(&tmp, "Digite o titulo de eleitor: *");
+    readVoterNumber(&tmp, "Digite o titulo de eleitor (12 ou 13 digitos): *");
     if (searchCitizenByVoterNumber(tmp.voterNumber) >= 0)
     {
         printf("Titulo ja cadastrado.\n");
@@ -131,13 +131,15 @@ void createCitizen()
     }
 
     readName(&tmp, "Digite o nome completo: *");
-    readPhone(&tmp, "Digite o telefone (com DDD): ");
+    readPhone(&tmp, "Digite o telefone (com DDD, ex: 11911111111): ");
     readAddress(&tmp, "Digite o endereco: ");
     readBirthdate(&tmp, "Digite a data de nascimento (DD-MM-YYYY): *");
 
     tmp.deleted = 0;
     pushCitizen(&tmp);
     citizensModified = 1;
+
+    printf("\n");
 
     printShowCitizenHeader("Pessoa criada com sucesso!");
     printShowCitizenUI(&tmp);
@@ -334,6 +336,8 @@ void showCitizenByVoterNumber()
     if (citizensCount == 0)
     {
         printf("Nenhuma pessoa cadastrada.\n");
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 
@@ -347,6 +351,8 @@ void showCitizenByVoterNumber()
     if (idx < 0)
     {
         printf("Pessoa com titulo %s nao encontrada.\n", title);
+        printf("Pressione Enter para continuar...\n");
+        cleanerKeyboard();
         return;
     }
 
@@ -409,12 +415,21 @@ void readVoterNumber(citizen *tmp, const char *prompt)
         scanf("%13s", tmp->voterNumber);
         cleanerKeyboard();
 
-        if (strlen(tmp->voterNumber) == 13 && isdigit(tmp->voterNumber[0]) && isdigit(tmp->voterNumber[1]) &&
-            isdigit(tmp->voterNumber[2]) && isdigit(tmp->voterNumber[3]) && isdigit(tmp->voterNumber[4]) &&
-            isdigit(tmp->voterNumber[5]) && isdigit(tmp->voterNumber[6]) && isdigit(tmp->voterNumber[7]) &&
-            isdigit(tmp->voterNumber[8]) && isdigit(tmp->voterNumber[9]) && isdigit(tmp->voterNumber[10]) &&
-            isdigit(tmp->voterNumber[11]) && isdigit(tmp->voterNumber[12]))
-            break;
+        int len = strlen(tmp->voterNumber);
+        if (len == 12 || len == 13)
+        {
+            int allDigits = 1;
+            for (int i = 0; i < len; i++)
+            {
+                if (!isdigit(tmp->voterNumber[i]))
+                {
+                    allDigits = 0;
+                    break;
+                }
+            }
+
+            if (allDigits) break;
+        }
 
         printf("Titulo invalido. Tente novamente: ");
     }
@@ -438,18 +453,41 @@ void readPhone(citizen *tmp, const char *prompt)
     printf("%s", prompt);
     while (1)
     {
-        scanf("%19s", tmp->phone);
-        cleanerKeyboard();
+        char buffer[32];
+        if (fgets(buffer, sizeof(buffer), stdin) == NULL)
+        {
+            printf("Erro ao ler telefone. Tente novamente: ");
+            continue;
+        }
 
-        if (strlen(tmp->phone) > 0 && strlen(tmp->phone) < 20 &&
-            isdigit(tmp->phone[0]) && isdigit(tmp->phone[1]) &&
-            isdigit(tmp->phone[2]) && isdigit(tmp->phone[3]) &&
-            isdigit(tmp->phone[4]) && isdigit(tmp->phone[5]) &&
-            isdigit(tmp->phone[6]) && isdigit(tmp->phone[7]) &&
-            isdigit(tmp->phone[8]) && isdigit(tmp->phone[9]))
+        buffer[strcspn(buffer, "\n")] = '\0';
+
+        size_t len = strlen(buffer);
+        if (len == 0)
+        {
+            tmp->phone[0] = '\0';
             break;
+        }
+        else if (len == 11)
+        {
+            int allDigits = 1;
+            for (int i = 0; i < 11; i++)
+            {
+                if (!isdigit(buffer[i]))
+                {
+                    allDigits = 0;
+                    break;
+                }
+            }
 
-        printf("Telefone invalido. Tente novamente: ");
+            if (allDigits)
+            {
+                strcpy(tmp->phone, buffer);
+                break;
+            }
+        }
+
+        printf("Telefone invalido. Digite 11 digitos numericos ou deixe em branco: ");
     }
 }
 void readAddress(citizen *tmp, const char *prompt)
@@ -457,11 +495,22 @@ void readAddress(citizen *tmp, const char *prompt)
     printf("%s", prompt);
     while (1)
     {
-        fgets(tmp->address, sizeof(tmp->address), stdin);
-        tmp->address[strcspn(tmp->address, "\n")] = 0; // Remove newline
+        if (fgets(tmp->address, sizeof(tmp->address), stdin) == NULL)
+        {
+            printf("Erro ao ler endereco. Tente novamente: ");
+            continue;
+        }
 
-        if (strlen(tmp->address) > 0 && strlen(tmp->address) < 200)
-            break;
+        size_t len = strcspn(tmp->address, "\n");
+        if (tmp->address[len] == '\n')
+            tmp->address[len] = '\0';
+        else
+        {
+            int ch;
+            while ((ch = getchar()) != '\n' && ch != EOF);
+        }
+
+        if (strlen(tmp->address) < sizeof(tmp->address)) break;
 
         printf("Endereco invalido. Tente novamente: ");
     }
@@ -548,16 +597,16 @@ int searchCitizenByVoterNumber(const char *voterNumber)
 
 void printShowCitizenHeader(const char *header)
 {
-    printf("+----------------------------------------------------------------------------------------------------------------------------+\n");
-    printf("| %-122s |\n", header);
+    printf("+---------------------------------------------------------------------------------------------------------------------------+\n");
+    printf("| %-121s |\n", header);
     printShowCitizenBorder();
-    printf("| %-11s | %-13s | %-30s | %-12s | %-30s | %-11s |\n",
+    printf("| %-11s | %-13s | %-30s | %-11s | %-30s | %-11s |\n",
            "CPF", "Title", "Name", "Phone", "Address", "Birthdate");
     printShowCitizenBorder();
 }
 void printShowCitizenBorder()
 {
-    printf("+-------------+---------------+--------------------------------+--------------+--------------------------------+-------------+\n");
+    printf("+-------------+---------------+--------------------------------+-------------+--------------------------------+-------------+\n");
 }
 void printShowCitizenUI(const citizen *p)
 {

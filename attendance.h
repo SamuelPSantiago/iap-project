@@ -17,4 +17,7 @@ int hasAlreadyVoted(const char *cpf, int year, int ufCode);
 void registerAttendance(const char *cpf, int year, int ufCode);
 void showAttendanceCount();
 
+const attendance *getAttendances();
+int getAttendancesCount();
+
 #endif
