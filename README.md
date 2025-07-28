@@ -2,6 +2,7 @@
 
 Projeto desenvolvido para a disciplina **Introdução à Programação**, no curso de **Engenharia da Computação** do **Instituto Federal do Ceará - Campus Fortaleza**.
 
+&nbsp;
 
 ## 🧾 Descrição
 
@@ -10,7 +11,8 @@ Este projeto consiste em um sistema de gerenciamento de dados eleitorais utiliza
 - **Alocação dinâmica** de memória
 - Manipulação de **arquivos binários**
 - Separação modular do código em **arquivos `.h` e `.c`**
-  
+
+&nbsp;
 
 ## 📂 Entidades e Funcionalidades
 
@@ -38,6 +40,7 @@ Este projeto consiste em um sistema de gerenciamento de dados eleitorais utiliza
 - **Campos:** CPF (PK), ano (PK), código_UF (PK)
 - **Operações:** mostrar quantidade de comparecimento por UF e ano
 
+&nbsp;
 
 ## ✅ Regras de Validação
 
@@ -45,6 +48,7 @@ Este projeto consiste em um sistema de gerenciamento de dados eleitorais utiliza
 - Campos obrigatórios (marcados com `*`) não podem estar vazios.
 - Referências cruzadas exigem validação de existência em registros anteriores (por exemplo, uma eleição só pode ser criada com um `codigo_UF` válido).
 
+&nbsp;
 
 ## 🛠 Estrutura do Código
 
@@ -59,6 +63,7 @@ O projeto está dividido em múltiplos arquivos para manter a organização e re
 - `comparecimento.h` / `comparecimento.c`: controle de presença
 - `result.h` / `result.c`: funcionalidade de obter os resultados
 
+&nbsp;
 
 ## 📌 Requisitos Técnicos
 
@@ -66,6 +71,7 @@ O projeto está dividido em múltiplos arquivos para manter a organização e re
 - Terminal para entrada/saída de dados
 - Sistema de arquivos local para armazenamento dos `.data` binários
 
+&nbsp;
 
 ## 🗂 Como Executar
 
