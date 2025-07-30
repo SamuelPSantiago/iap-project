@@ -8,9 +8,9 @@
 #include "RESULT.h"
 
 enum MenuOptions {
-    showResultR,
-    showAttendanceR,
-    exitMenuR
+    showResultR = 1,
+    showAttendanceR = 2,
+    exitMenuR = 0
 };
 
 // Menu controllers
