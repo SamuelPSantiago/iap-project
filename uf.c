@@ -13,12 +13,12 @@ static int ufsModified = 0;
 static int nextCodeUF = 1;
 
 enum MenuOptions {
-    insert = 1,
-    update = 2,
-    delete = 3,
-    list = 4,
-    show = 5,
-    exitMenu = 0
+    insertU = 1,
+    updateU = 2,
+    deleteU = 3,
+    listU = 4,
+    showU = 5,
+    exitMenuU = 0
 };
 
 // Menu controllers
@@ -52,22 +52,22 @@ void stateMachineUF()
 
         switch (op)
         {
-        case insert:
+        case insertU:
             createUF();
             break;
-        case update:
+        case updateU:
             updateUF();
             break;
-        case delete:
+        case deleteU:
             deleteUF();
             break;
-        case list:
+        case listU:
             showUF();
             break;
-        case show:
+        case showU:
             showSpecificUF();
             break;
-        case exitMenu:
+        case exitMenuU:
             saveUFs();
             break;
         default:

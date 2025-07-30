@@ -16,11 +16,11 @@ static int candidatesModified = 0;
 
 enum MenuOptions
 {
-    insert = 1,
-    delete = 2,
-    listByUFAndYear = 3,
-    listByYear = 4,
-    exitCandidate = 0
+    insertCan = 1,
+    deleteCan = 2,
+    listByUFAndYearCan = 3,
+    listByYearCan = 4,
+    exitCandidateCan = 0
 };
 
 // Menu controllers
@@ -53,19 +53,19 @@ void stateMachineCandidate()
 
         switch (op)
         {
-        case insert:
+        case insertCan:
             createCandidate();
             break;
-        case delete:
+        case deleteCan:
             deleteCandidate();
             break;
-        case listByUFAndYear:
+        case listByUFAndYearCan:
             showCandidatesByUFAndYear();
             break;
-        case listByYear:
+        case listByYearCan:
             showCandidatesByYear();
             break;
-        case exitCandidate:
+        case exitCandidateCan:
             saveCandidates();
             break;
         default:

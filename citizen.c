@@ -12,12 +12,12 @@ static int citizensCapacity = 0;
 static int citizensModified = 0;
 
 enum MenuOptions {
-    insert = 1,
-    update = 2,
-    delete = 3,
-    list = 4,
-    show = 5,
-    exitMenu = 0
+    insertCtz = 1,
+    updateCtz = 2,
+    deleteCtz = 3,
+    listCtz = 4,
+    showCtz = 5,
+    exitMenuCtz = 0
 };
 
 // Menu controllers
@@ -51,22 +51,22 @@ void stateMachineCitizen()
 
         switch (op)
         {
-        case insert:
+        case insertCtz:
             createCitizen();
             break;
-        case update:
+        case updateCtz:
             updateCitizen();
             break;
-        case delete:
+        case deleteCtz:
             deleteCitizen();
             break;
-        case list:
+        case listCtz:
             showCitizen();
             break;
-        case show:
+        case showCtz:
             showCitizenByVoterNumber();
             break;
-        case exitMenu:
+        case exitMenuCtz:
             saveCitizens();
             break;
         default:

@@ -15,13 +15,13 @@
 
 enum MenuOptions
 {
-    uf = 1,
-    election,
-    citizen,
-    candidate,
-    vote,
-    result,
-    exitProgram
+    ufM = 1,
+    electionM,
+    citizenM,
+    candidateM,
+    voteM,
+    resultM,
+    exitProgramM
 };
 
 int main()
@@ -43,37 +43,37 @@ int main()
 
         switch (op)
         {
-        case uf:
+        case ufM:
             printf("\n");
             stateMachineUF();
             menu();
             break;
-        case election:
+        case electionM:
             printf("\n");
             stateMachineElection();
             menu();
             break;
-        case citizen:
+        case citizenM:
             printf("\n");
             stateMachineCitizen();
             menu();
             break;
-        case candidate:
+        case candidateM:
             printf("\n");
             stateMachineCandidate();
             menu();
             break;
-        case vote:
+        case voteM:
             printf("\n");
             stateMachineVote();
             menu();
             break;
-        case result:
+        case resultM:
             printf("\n");
             stateMachineResult();
             menu();
             break;
-        case exitProgram:
+        case exitProgramM:
             break;
         default:
             printf("Opcao invalida. Tente novamente:");

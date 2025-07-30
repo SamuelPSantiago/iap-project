@@ -12,12 +12,12 @@ static int electionsCapacity = 0;
 static int electionsModified = 0;
 
 enum MenuOptions {
-    insert = 1,
-    update = 2,
-    delete = 3,
-    list = 4,
-    show = 5,
-    exitMenu = 0
+    insertE = 1,
+    updateE = 2,
+    deleteE = 3,
+    listE = 4,
+    showE = 5,
+    exitMenuE = 0
 };
 
 // Menu controllers
@@ -50,22 +50,22 @@ void stateMachineElection()
         printf("\n");
         switch (option)
         {
-        case insert:
+        case insertE:
             createElection();
             break;
-        case update:
+        case updateE:
             updateElection();
             break;
-        case delete:
+        case deleteE:
             deleteElection();
             break;
-        case list:
+        case listE:
             listElections();
             break;
-        case show:
+        case showE:
             viewElection();
             break;
-        case exitMenu:
+        case exitMenuE:
             saveElections();
             break;
         default:
