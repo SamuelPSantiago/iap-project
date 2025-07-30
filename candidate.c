@@ -8,6 +8,7 @@
 #include "CANDIDATE.h"
 #include "UF.h"
 #include "CITIZEN.h"
+#include "ELECTION.h"
 
 static candidate *candidates = NULL;
 static int candidatesCount = 0;
@@ -128,6 +129,12 @@ void createCandidate()
     if (searchUF(tmp.ufCode) < 0)
     {
         printf("Codigo de UF nao encontrado.\n");
+        return;
+    }
+
+    if(findElectionIndex(tmp.year, tmp.ufCode) < 0)
+    {
+        printf("Eleicao nao encontrada para o ano %d e UF %d.\n", tmp.year, tmp.ufCode);
         return;
     }
 
