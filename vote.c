@@ -183,9 +183,6 @@ void createVote()
     votesModified = 1;
 
     printf("\nVoto confirmado!\n");
-
-    printf("Data e hora gravada: %s\n", tmp.dateTime);
-
     printf("Pressione Enter para continuar...\n");
     cleanerKeyboard();
 }

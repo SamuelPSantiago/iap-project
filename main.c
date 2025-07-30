@@ -16,12 +16,12 @@
 enum MenuOptions
 {
     ufM = 1,
-    electionM,
-    citizenM,
-    candidateM,
-    voteM,
-    resultM,
-    exitProgramM
+    electionM = 2,
+    citizenM = 3,
+    candidateM = 4,
+    voteM = 5,
+    resultM = 6,
+    exitProgramM = 0
 };
 
 int main()
