@@ -7,6 +7,12 @@
 #include "ATTENDANCE.h"
 #include "RESULT.h"
 
+enum MenuOptions {
+    showResult,
+    showAttendance,
+    exitMenu
+};
+
 // Menu controllers
 void menuResult()
 {
@@ -34,13 +40,13 @@ void stateMachineResult()
         printf("\n");
         switch (option)
         {
-        case 1:
+        case showResult:
             showElectionResults();
             break;
-        case 2:
+        case showAttendance:
             showElectionAttendance();
             break;
-        case 0: break;
+        case exitMenu: break;
         default:
             printf("Opcao invalida.\n\n");
         }

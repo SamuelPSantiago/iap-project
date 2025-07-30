@@ -14,6 +14,15 @@ static int candidatesCount = 0;
 static int candidatesCapacity = 0;
 static int candidatesModified = 0;
 
+enum MenuOptions
+{
+    insert = 1,
+    delete = 2,
+    listByUFAndYear = 3,
+    listByYear = 4,
+    exitCandidate = 0
+};
+
 // Menu controllers
 void menuCandidate()
 {
@@ -44,19 +53,19 @@ void stateMachineCandidate()
 
         switch (op)
         {
-        case 1:
+        case insert:
             createCandidate();
             break;
-        case 2:
+        case delete:
             deleteCandidate();
             break;
-        case 3:
+        case listByUFAndYear:
             showCandidatesByUFAndYear();
             break;
-        case 4:
+        case listByYear:
             showCandidatesByYear();
             break;
-        case 0:
+        case exitCandidate:
             saveCandidates();
             break;
         default:

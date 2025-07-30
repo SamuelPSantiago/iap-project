@@ -17,6 +17,13 @@ static int votesCount = 0;
 static int votesCapacity = 0;
 static int votesModified = 0;
 
+enum MenuOptions {
+    insert = 1,
+    listByCandidateAndYear = 2,
+    listByYear = 3,
+    exitMenu = 0
+};
+
 // Menu controllers
 void menuVote()
 {
@@ -45,16 +52,16 @@ void stateMachineVote()
         printf("\n");
         switch (op)
         {
-        case 1:
+        case insert:
             createVote();
             break;
-        case 2:
+        case listByCandidateAndYear:
             showVotesByCandidateAndYear();
             break;
-        case 3:
+        case listByYear:
             showVotesByYear();
             break;
-        case 0:
+        case exitMenu:
             saveVotes();
             saveAttendances();
             break;

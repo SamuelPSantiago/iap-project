@@ -11,6 +11,15 @@ static int citizensCount = 0;
 static int citizensCapacity = 0;
 static int citizensModified = 0;
 
+enum MenuOptions {
+    insert = 1,
+    update = 2,
+    delete = 3,
+    list = 4,
+    show = 5,
+    exitMenu = 0
+};
+
 // Menu controllers
 void menuCitizen()
 {
@@ -42,22 +51,22 @@ void stateMachineCitizen()
 
         switch (op)
         {
-        case 1:
+        case insert:
             createCitizen();
             break;
-        case 2:
+        case update:
             updateCitizen();
             break;
-        case 3:
+        case delete:
             deleteCitizen();
             break;
-        case 4:
+        case list:
             showCitizen();
             break;
-        case 5:
+        case show:
             showCitizenByVoterNumber();
             break;
-        case 0:
+        case exitMenu:
             saveCitizens();
             break;
         default:

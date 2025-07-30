@@ -13,6 +13,17 @@
 #include "ATTENDANCE.h"
 #include "RESULT.h"
 
+enum MenuOptions
+{
+    uf = 1,
+    election,
+    citizen,
+    candidate,
+    vote,
+    result,
+    exitProgram
+};
+
 int main()
 {
     menu();
@@ -32,37 +43,37 @@ int main()
 
         switch (op)
         {
-        case 1:
+        case uf:
             printf("\n");
             stateMachineUF();
             menu();
             break;
-        case 2:
+        case election:
             printf("\n");
             stateMachineElection();
             menu();
             break;
-        case 3:
+        case citizen:
             printf("\n");
             stateMachineCitizen();
             menu();
             break;
-        case 4:
+        case candidate:
             printf("\n");
             stateMachineCandidate();
             menu();
             break;
-        case 5:
+        case vote:
             printf("\n");
             stateMachineVote();
             menu();
             break;
-        case 6:
+        case result:
             printf("\n");
             stateMachineResult();
             menu();
             break;
-        case 0:
+        case exitProgram:
             break;
         default:
             printf("Opcao invalida. Tente novamente:");
